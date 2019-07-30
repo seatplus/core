@@ -163,8 +163,11 @@ return [
         Illuminate\View\ViewServiceProvider::class,
 
         /*
-         * Package Service Providers...
+         * SeAT plus Service Providers...
          */
+
+        Seatplus\Web\WebServiceProvider::class,
+        Seatplus\Eveapi\EveapiServiceProvider::class,
 
         /*
          * Application Service Providers...

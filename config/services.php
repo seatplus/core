@@ -15,8 +15,8 @@ return [
     */
 
     'mailgun' => [
-        'domain' => env('MAILGUN_DOMAIN'),
-        'secret' => env('MAILGUN_SECRET'),
+        'domain'   => env('MAILGUN_DOMAIN'),
+        'secret'   => env('MAILGUN_SECRET'),
         'endpoint' => env('MAILGUN_ENDPOINT', 'api.mailgun.net'),
     ],
 
@@ -25,7 +25,7 @@ return [
     ],
 
     'ses' => [
-        'key' => env('AWS_ACCESS_KEY_ID'),
+        'key'    => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
@@ -34,14 +34,23 @@ return [
         'secret' => env('SPARKPOST_SECRET'),
     ],
 
-    'stripe' => [
-        'model' => App\User::class,
-        'key' => env('STRIPE_KEY'),
-        'secret' => env('STRIPE_SECRET'),
+    'stripe'    => [
+        'model'   => App\User::class,
+        'key'     => env('STRIPE_KEY'),
+        'secret'  => env('STRIPE_SECRET'),
         'webhook' => [
-            'secret' => env('STRIPE_WEBHOOK_SECRET'),
+            'secret'    => env('STRIPE_WEBHOOK_SECRET'),
             'tolerance' => env('STRIPE_WEBHOOK_TOLERANCE', 300),
         ],
+    ],
+
+    // If you want to make use of SSO via EVEOnline, create
+    // an application at https://developers.eveonline.com/applications
+    // and fill in the ClientID and ClientSecret in the .env file
+    'eveonline' => [
+        'client_id'     => env('EVE_CLIENT_ID'),
+        'client_secret' => env('EVE_CLIENT_SECRET'),
+        'redirect'      => env('EVE_CALLBACK_URL'),
     ],
 
 ];
