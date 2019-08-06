@@ -22,6 +22,13 @@ window.Vue = require('vue');
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 
+/*
+* Install bootstrap-vue components
+*/
+import BootstrapVue from 'bootstrap-vue' //Importing
+
+Vue.use(BootstrapVue); // Telling Vue to use this in whole application
+
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application

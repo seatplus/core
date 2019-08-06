@@ -24,7 +24,8 @@
         "vue-template-compiler": "^2.6.10"
     },
     "dependencies": {
+        "@fortawesome/fontawesome-free": "^5.8.1",
         "admin-lte": "^3.0.0-beta.2",
-        "@fortawesome/fontawesome-free": "^5.8.1"
+        "bootstrap-vue": "^2.0.0-rc.27"
     }
 }
