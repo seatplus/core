@@ -1,5 +1,7 @@
 const mix = require('laravel-mix');
 
+require('laravel-mix-copy-watched');
+
 /*
  |--------------------------------------------------------------------------
  | Mix Asset Management
@@ -10,10 +12,12 @@ const mix = require('laravel-mix');
  | file for the application as well as bundling up all the JS files.
  |
  */
-
-mix.js('resources/js/app.js', 'public/js')
-   .sass('resources/sass/app.scss', 'public/css');
-
 if (! mix.inProduction()) {
-  mix.copyDirectory('packages/seatplus/web/src/resources/js/components', './resources/js/components')
+  mix.js('resources/js/app.js', 'public/js')
+      .sass('resources/sass/app.scss', 'public/css')
+      //.copyWatched('packages/seatplus/web/src/resources/js/components/*.{vue}', 'resources/js/components');
+      .copyDirectoryWatched('packages/seatplus/web/src/resources/js/components/', 'resources/js/components');
+  //mix.copyDirectory('packages/seatplus/web/src/resources/js/components', './resources/js/components')
 }
+
+

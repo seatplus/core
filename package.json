@@ -12,9 +12,12 @@
     "devDependencies": {
         "axios": "^0.18",
         "bootstrap": "^4.0.0",
+        "browser-sync": "^2.26.7",
+        "browser-sync-webpack-plugin": "^2.0.1",
         "cross-env": "^5.2.0",
         "jquery": "^3.2",
         "laravel-mix": "^4.0.7",
+        "laravel-mix-copy-watched": "^2.1.4",
         "lodash": "^4.17.5",
         "popper.js": "^1.12",
         "resolve-url-loader": "^2.3.1",
@@ -26,6 +29,7 @@
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.8.1",
         "admin-lte": "^3.0.0-beta.2",
-        "bootstrap-vue": "^2.0.0-rc.27"
+        "bootstrap-vue": "^2.0.0-rc.27",
+        "sweetalert2": "^8.15.3"
     }
 }
