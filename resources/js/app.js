@@ -7,40 +7,34 @@
 
 require('./bootstrap');
 
-window.Vue = require('vue');
-
-/**
- * The following block of code may be used to automatically register your
- * Vue components. It will recursively scan this directory for the Vue
- * components and automatically register them with their "basename".
- *
- * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
- */
-
-/* const files = require.context('./components', true, /\.vue$/i);
- files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));*/
-
-const files = require.context('./', true, /\.vue$/i, 'lazy').keys();
-
-files.forEach(file => {
-  Vue.component(file.split('/').pop().split('.')[0], () => import(`${file}`));
-});
-
-//Vue.component('example-component', require('./components/ExampleComponent.vue').default);
-
+import Vue from 'vue'
 /*
 * Install bootstrap-vue components
 */
 import BootstrapVue from 'bootstrap-vue' //Importing
+Vue.use(BootstrapVue); // Telling Vue to use BootstrapVue in whole application
 
-Vue.use(BootstrapVue); // Telling Vue to use this in whole application
+import { InertiaApp } from '@inertiajs/inertia-vue'
+Vue.use(InertiaApp); // Telling Vue to use InertiaApp in whole application
 
-/**
- * Next, we will create a fresh Vue application instance and attach it to
- * the page. Then, you may begin adding components to this application
- * or customize the JavaScript scaffolding to fit your unique needs.
- */
+import I18n from './vendor/I18n'
+window.I18n = I18n
+Vue.prototype.$I18n = new I18n;
 
-const app = new Vue({
-    el: '#app'
-});
+// Add route helper to vue
+Vue.mixin({
+  methods: {
+    route: window.route
+  }
+})
+
+const app = document.getElementById('app')
+
+new Vue({
+  render: h => h(InertiaApp, {
+    props: {
+      initialPage: JSON.parse(app.dataset.page),
+      resolveComponent: name => import(`@/Pages/${name}`).then(module => module.default),
+    },
+  }),
+}).$mount(app)
