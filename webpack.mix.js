@@ -16,8 +16,8 @@ require('laravel-mix-copy-watched');
 if (! mix.inProduction()) {
   mix.js('resources/js/app.js', 'public/js')
       .sass('resources/sass/app.scss', 'public/css')
-      //.copyWatched('packages/seatplus/web/src/resources/js/components/*.{vue}', 'resources/js/components');
-      .copyDirectoryWatched('packages/seatplus/web/src/resources/js/components/', 'resources/js/components')
+      .copyWatched('packages/seatplus/web/src/resources/js/components/*.{vue}', 'resources/js/components')
+      //.copyDirectoryWatched('packages/seatplus/web/src/resources/js/components/', 'resources/js/components')
       .webpackConfig({
         output : {chunkFilename: 'js/[name].js?id=[chunkhash]'},
         resolve: {
