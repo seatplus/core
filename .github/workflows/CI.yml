@@ -12,7 +12,7 @@ jobs:
     - name: Get required php packages
       run: |
         php -v,
-        apt-get install pcntl
+        apk add pcntl
     - name: Laravel PHPUnit
       uses: nathanheffley/laravel-phpunit-action@v0.1.0
     - name: Run a multi-line script
