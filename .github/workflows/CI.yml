@@ -9,12 +9,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Get required php packages
-      run: |
-        php -v,
-        apk add pcntl
     - name: Laravel PHPUnit
-      uses: nathanheffley/laravel-phpunit-action@v0.1.0
+      uses: seatplus/laravel-horizon-phpunit-action@v0.1.0
     - name: Run a multi-line script
       run: |
         echo Add other actions to build,
