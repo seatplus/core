@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Laravel PHPUnit
-      uses: seatplus/laravel-horizon-phpunit-action@v0.1.0
+      uses: seatplus/laravel-horizon-phpunit-action@master
     - name: Run a multi-line script
       run: |
         echo Add other actions to build,
