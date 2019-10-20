@@ -29,7 +29,7 @@
         "fzaninotto/faker": "^1.4",
         "itsgoingd/clockwork": "^4.0",
         "mockery/mockery": "^1.0",
-        "nunomaduro/collision": "^2.0",
+        "nunomaduro/collision": "^3.0",
         "phpunit/phpunit": "^7.5",
         "inertiajs/inertia-laravel": "^0.1.2",
         "seatplus/eseye": "^2.0",
