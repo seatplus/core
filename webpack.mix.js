@@ -1,4 +1,7 @@
 const mix = require('laravel-mix');
+const path = require('path')
+
+require('laravel-mix-copy-watched');
 
 /*
  |--------------------------------------------------------------------------
@@ -10,6 +13,20 @@ const mix = require('laravel-mix');
  | file for the application as well as bundling up all the JS files.
  |
  */
+if (! mix.inProduction()) {
+  mix.js('resources/js/app.js', 'public/js')
+      .sass('resources/sass/app.scss', 'public/css')
+      .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Pages/Configuration', 'resources/js/Pages/Configuration')
+      .webpackConfig({
+        output : {chunkFilename: 'js/[name].js?id=[chunkhash]'},
+        resolve: {
+          alias: {
+            vue$: 'vue/dist/vue.runtime.esm.js',
+            '@' : path.resolve('resources/js'),
+          },
+        },
+      })
+  //mix.copyDirectory('packages/seatplus/web/src/resources/js/components', './resources/js/components')
+}
 
-mix.js('resources/js/app.js', 'public/js')
-    .sass('resources/sass/app.scss', 'public/css');
+
