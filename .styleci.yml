@@ -1,0 +1,14 @@
+preset: laravel
+
+enabled:
+  - concat_with_spaces
+  - no_empty_comment
+
+disabled:
+  - unused_use
+  - concat_without_spaces
+
+finder:
+  not-name:
+    - index.php
+    - server.php
