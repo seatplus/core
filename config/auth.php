@@ -68,7 +68,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model'  => Seatplus\Web\Models\User::class,
+            'model'  => Seatplus\Auth\Models\User::class,
         ],
 
         // 'users' => [

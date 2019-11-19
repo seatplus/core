@@ -61,7 +61,8 @@
             "Tests\\": "tests/",
 
             "Seatplus\\Web\\": "packages/seatplus/web/src/",
-            "Seatplus\\Eveapi\\": "packages/seatplus/eveapi/src/"
+            "Seatplus\\Eveapi\\": "packages/seatplus/eveapi/src/",
+            "Seatplus\\Auth\\": "packages/seatplus/auth/src/"
         },
         "files": [
             "packages/seatplus/web/src/Helpers/helpers.php"

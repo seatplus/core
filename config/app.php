@@ -168,7 +168,7 @@ return [
 
         Seatplus\Web\WebServiceProvider::class,
         Seatplus\Eveapi\EveapiServiceProvider::class,
-        //TODO:
+        Seatplus\Auth\AuthenticationServiceProvider::class,
 
         /*
          * Application Service Providers...
