@@ -1,11 +1,13 @@
 preset: laravel
+
 enabled:
   - alpha_ordered_imports
   - concat_with_spaces
   - no_empty_comment
+
 disabled:
-  - length_ordered_imports
   - unused_use
+
 finder:
   not-name:
     - index.php
