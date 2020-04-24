@@ -35,7 +35,7 @@
         "phpunit/phpunit": "^8.0",
         "seatplus/eseye": "^2.0",
         "spatie/laravel-permission": "^3.0",
-        "thepinecode/i18n": "^0.7",
+        "thepinecode/i18n": "^0.8",
         "tightenco/ziggy": "^0.8.0"
     },
     "config": {
