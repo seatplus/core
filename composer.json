@@ -19,7 +19,7 @@
         "fideloper/proxy": "^4.0",
         "laravel/framework": "^6.2",
         "laravel/horizon": "^3.2",
-        "laravel/tinker": "^1.0",
+        "laravel/tinker": "^2.4",
         "seatplus/eseye": "^2.0",
         "seatplus/auth": "^0.1.0",
         "seatplus/web": "^0.1.0",
