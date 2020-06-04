@@ -2,7 +2,6 @@ const mix = require('laravel-mix');
 const path = require('path');
 const tailwindcss = require('tailwindcss');
 
-require('laravel-mix-purgecss');
 require('laravel-mix-copy-watched');
 
 /*
@@ -43,7 +42,7 @@ if (! mix.inProduction()) {
 }
 
 if( mix.inProduction()) {
-    mix.purgeCss();
+
 }
 
 
