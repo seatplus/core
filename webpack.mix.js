@@ -33,12 +33,18 @@ mix.js('resources/js/app.js', 'public/js')
 
 if (! mix.inProduction()) {
     mix.copyDirectoryWatched('packages/seatplus/web/src/resources/js/Pages/AccessControl', 'resources/js/Pages/AccessControl')
-      .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Pages/Auth', 'resources/js/Pages/Auth')
-      .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Pages/Configuration', 'resources/js/Pages/Configuration')
-      .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Pages/Dashboard', 'resources/js/Pages/Dashboard')
-      .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Pages/Character', 'resources/js/Pages/Character')
-      .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Shared', 'resources/js/Shared')
-      .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Pages/Configuration/Scopes', 'resources/js/Pages/Configuration/Scopes')
+        .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Pages/AccessControl/AclTypes', 'resources/js/Pages/AccessControl/AclTypes')
+        .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Pages/Auth', 'resources/js/Pages/Auth')
+        .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Pages/Configuration', 'resources/js/Pages/Configuration')
+        .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Pages/Dashboard', 'resources/js/Pages/Dashboard')
+        .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Pages/Character', 'resources/js/Pages/Character')
+        .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Pages/Corporation', 'resources/js/Pages/Corporation')
+        .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Pages/Corporation/Recruitment', 'resources/js/Pages/Corporation/Recruitment')
+        .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Shared', 'resources/js/Shared')
+        .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Shared/Transitions', 'resources/js/Shared/Transitions')
+        .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Shared/Layout', 'resources/js/Shared/Layout')
+        .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Shared/Modals', 'resources/js/Shared/Modals')
+        .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Pages/Configuration/Scopes', 'resources/js/Pages/Configuration/Scopes')
 }
 
 if( mix.inProduction()) {
