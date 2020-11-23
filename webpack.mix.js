@@ -40,11 +40,14 @@ if (! mix.inProduction()) {
         .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Pages/Character', 'resources/js/Pages/Character')
         .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Pages/Corporation', 'resources/js/Pages/Corporation')
         .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Pages/Corporation/Recruitment', 'resources/js/Pages/Corporation/Recruitment')
+        .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Pages/Corporation/Compliance', 'resources/js/Pages/Corporation/Compliance')
         .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Shared', 'resources/js/Shared')
         .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Shared/Transitions', 'resources/js/Shared/Transitions')
         .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Shared/Layout', 'resources/js/Shared/Layout')
+        .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Shared/Layout/Cards', 'resources/js/Shared/Layout/Cards')
         .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Shared/Modals', 'resources/js/Shared/Modals')
         .copyDirectoryWatched('packages/seatplus/web/src/resources/js/Pages/Configuration/Scopes', 'resources/js/Pages/Configuration/Scopes')
+        .copyDirectoryWatched('packages/seatplus/web/src/resources/js', 'resources/js')
 }
 
 if( mix.inProduction()) {
