@@ -1,0 +1,29 @@
+name: Laravel
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+
+jobs:
+  laravel:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup PHP, with composer and extensions
+      uses: shivammathur/setup-php@v2 #https://github.com/shivammathur/setup-php
+      with:
+        php-version: '8.0'
+        extensions: mbstring, dom, fileinfo
+    - name: Redis Server in GitHub Actions
+      uses: supercharge/redis-github-action@1.1.0
+      with:
+        # Redis version to use
+        redis-version: 5 # optional, default is latest
+    - name: Copy productive composer file
+      run: cp composer-prod.json composer.json
+    - name: Install Dependencies
+      run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
