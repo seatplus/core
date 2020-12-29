@@ -1,5 +1,7 @@
 preset: laravel
 
+version: 8
+
 enabled:
   - concat_with_spaces
   - no_empty_comment
