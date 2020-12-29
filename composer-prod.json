@@ -12,6 +12,12 @@
         "management"
     ],
     "license": "MIT",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/herpaderpaldent/i18n/"
+        }
+    ],
     "require": {
         "php": "^8.0",
         "ext-json": "*",
