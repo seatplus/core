@@ -14,16 +14,8 @@
     "license": "MIT",
     "repositories": [
         {
-            "type": "path",
-            "url": "packages/seatplus/web"
-        },
-        {
-            "type": "path",
-            "url": "packages/seatplus/auth"
-        },
-        {
-            "type": "path",
-            "url": "packages/seatplus/eveapi"
+            "type": "vcs",
+            "url": "https://github.com/herpaderpaldent/i18n/"
         }
     ],
     "require": {
@@ -35,8 +27,7 @@
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.0",
         "laravel/tinker": "^2.0",
-        "seatplus/web": "*",
-        "seatplus/eveapi": "*"
+        "seatplus/web": "^0.6.0"
     },
     "require-dev": {
         "facade/ignition": "^2.3.6",
@@ -57,9 +48,7 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "app/",
-            "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "App\\": "app/"
         },
         "classmap": [
             "database/seeders",
@@ -68,11 +57,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
-        },
-        "files": [
-
-        ]
+        }
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
