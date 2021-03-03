@@ -1,7 +1,4 @@
 /node_modules
-/public/hot
-/public/storage
-/storage/*.key
 /vendor
 .env
 .phpunit.result.cache
@@ -26,4 +23,8 @@ public/
 
 resources/
 
-storage/
+storage/clockwork/
+
+storage/eseye/
+
+storage/tinx/
