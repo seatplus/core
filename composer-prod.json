@@ -12,12 +12,6 @@
         "management"
     ],
     "license": "MIT",
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/herpaderpaldent/i18n/"
-        }
-    ],
     "require": {
         "php": "^8.0",
         "ext-json": "*",
@@ -27,9 +21,7 @@
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.0",
         "laravel/tinker": "^2.0",
-        "seatplus/auth": "^0.5.0",
-        "seatplus/web": "^0.5.0",
-        "seatplus/eveapi": "^0.5.0"
+        "seatplus/web": "^0.7.0"
     },
     "require-dev": {
         "facade/ignition": "^2.3.6",

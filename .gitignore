@@ -15,3 +15,15 @@ yarn-error.log
 _ide_helper.php
 /public/img/
 !/composer.lock
+
+cache/
+
+config/horizon.php
+
+logs/
+
+public/
+
+resources/
+
+storage/
