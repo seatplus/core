@@ -19,8 +19,6 @@ config/horizon.php
 
 logs/
 
-resources/
-
 storage/clockwork/
 
 storage/eseye/
