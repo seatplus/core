@@ -1328,16 +1328,16 @@
         },
         {
             "name": "inertiajs/inertia-laravel",
-            "version": "v0.4.0",
+            "version": "v0.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/inertiajs/inertia-laravel.git",
-                "reference": "097fe5b3be73ab8edea1a5216a696f627c1f6b03"
+                "reference": "96c60a7f01ac1032e3dd974b465b8ded41b299dc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/inertiajs/inertia-laravel/zipball/097fe5b3be73ab8edea1a5216a696f627c1f6b03",
-                "reference": "097fe5b3be73ab8edea1a5216a696f627c1f6b03",
+                "url": "https://api.github.com/repos/inertiajs/inertia-laravel/zipball/96c60a7f01ac1032e3dd974b465b8ded41b299dc",
+                "reference": "96c60a7f01ac1032e3dd974b465b8ded41b299dc",
                 "shasum": ""
             },
             "require": {
@@ -1384,7 +1384,7 @@
             ],
             "support": {
                 "issues": "https://github.com/inertiajs/inertia-laravel/issues",
-                "source": "https://github.com/inertiajs/inertia-laravel/tree/v0.4.0"
+                "source": "https://github.com/inertiajs/inertia-laravel/tree/v0.4.1"
             },
             "funding": [
                 {
@@ -1392,20 +1392,20 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-03-02T19:35:26+00:00"
+            "time": "2021-04-02T17:50:29+00:00"
         },
         {
             "name": "laravel/framework",
-            "version": "v8.35.0",
+            "version": "v8.35.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "476d06a41d109a355cb3a376bd09f21b7d83ebda"
+                "reference": "d118c0df39e7524131176aaf76493eae63a8a602"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/476d06a41d109a355cb3a376bd09f21b7d83ebda",
-                "reference": "476d06a41d109a355cb3a376bd09f21b7d83ebda",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/d118c0df39e7524131176aaf76493eae63a8a602",
+                "reference": "d118c0df39e7524131176aaf76493eae63a8a602",
                 "shasum": ""
             },
             "require": {
@@ -1560,20 +1560,20 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2021-03-30T14:09:34+00:00"
+            "time": "2021-03-30T21:34:17+00:00"
         },
         {
             "name": "laravel/horizon",
-            "version": "v5.7.3",
+            "version": "v5.7.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "06ba7869b68d71585eb070cf21311116fcadae98"
+                "reference": "7d0731229e3d14ffa431a4b6b031d55c64d88f97"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/06ba7869b68d71585eb070cf21311116fcadae98",
-                "reference": "06ba7869b68d71585eb070cf21311116fcadae98",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/7d0731229e3d14ffa431a4b6b031d55c64d88f97",
+                "reference": "7d0731229e3d14ffa431a4b6b031d55c64d88f97",
                 "shasum": ""
             },
             "require": {
@@ -1635,9 +1635,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/horizon/issues",
-                "source": "https://github.com/laravel/horizon/tree/v5.7.3"
+                "source": "https://github.com/laravel/horizon/tree/v5.7.4"
             },
-            "time": "2021-03-23T14:54:32+00:00"
+            "time": "2021-03-30T21:16:21+00:00"
         },
         {
             "name": "laravel/socialite",
@@ -3191,16 +3191,16 @@
         },
         {
             "name": "seatplus/eveapi",
-            "version": "0.8.0",
+            "version": "0.8.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/seatplus/eveapi.git",
-                "reference": "abbb29b6df0c1e6b3ab7cf4e273fdd0fa8c49dd4"
+                "reference": "4aedea94c8aa54d7673ec9a426c1bccc2b6a7dcc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/seatplus/eveapi/zipball/abbb29b6df0c1e6b3ab7cf4e273fdd0fa8c49dd4",
-                "reference": "abbb29b6df0c1e6b3ab7cf4e273fdd0fa8c49dd4",
+                "url": "https://api.github.com/repos/seatplus/eveapi/zipball/4aedea94c8aa54d7673ec9a426c1bccc2b6a7dcc",
+                "reference": "4aedea94c8aa54d7673ec9a426c1bccc2b6a7dcc",
                 "shasum": ""
             },
             "require": {
@@ -3252,22 +3252,22 @@
             "description": "API for receiving information from esi",
             "support": {
                 "issues": "https://github.com/seatplus/eveapi/issues",
-                "source": "https://github.com/seatplus/eveapi/tree/0.8.0"
+                "source": "https://github.com/seatplus/eveapi/tree/0.8.2"
             },
-            "time": "2021-03-30T12:03:47+00:00"
+            "time": "2021-04-01T16:55:12+00:00"
         },
         {
             "name": "seatplus/web",
-            "version": "0.8.0",
+            "version": "0.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/seatplus/web.git",
-                "reference": "736be3758f108dc72e068cf4de0e078533214b97"
+                "reference": "57ef1920302174df1f0586ace721614a2b93a2ee"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/seatplus/web/zipball/736be3758f108dc72e068cf4de0e078533214b97",
-                "reference": "736be3758f108dc72e068cf4de0e078533214b97",
+                "url": "https://api.github.com/repos/seatplus/web/zipball/57ef1920302174df1f0586ace721614a2b93a2ee",
+                "reference": "57ef1920302174df1f0586ace721614a2b93a2ee",
                 "shasum": ""
             },
             "require": {
@@ -3278,7 +3278,7 @@
                 "laravel/socialite": "^5.0",
                 "php": "^8.0",
                 "seatplus/auth": "^0.8.0",
-                "seatplus/eveapi": "^0.8.0",
+                "seatplus/eveapi": "^0.8.2",
                 "spatie/data-transfer-object": "^2.2",
                 "spatie/laravel-permission": "^4.0",
                 "tightenco/ziggy": "^1.0.4"
@@ -3320,9 +3320,9 @@
             "description": "Web frontend of seatplus",
             "support": {
                 "issues": "https://github.com/seatplus/web/issues",
-                "source": "https://github.com/seatplus/web/tree/0.8.0"
+                "source": "https://github.com/seatplus/web/tree/0.8.1"
             },
-            "time": "2021-03-30T20:21:25+00:00"
+            "time": "2021-04-04T20:52:16+00:00"
         },
         {
             "name": "spatie/data-transfer-object",
@@ -5800,16 +5800,16 @@
         },
         {
             "name": "tightenco/ziggy",
-            "version": "v1.0.5",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tighten/ziggy.git",
-                "reference": "be2b257b7a1a4d712e370505324220127595c0ae"
+                "reference": "ac0833645f25b51acf9e3d523d6bf8633938f9c5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tighten/ziggy/zipball/be2b257b7a1a4d712e370505324220127595c0ae",
-                "reference": "be2b257b7a1a4d712e370505324220127595c0ae",
+                "url": "https://api.github.com/repos/tighten/ziggy/zipball/ac0833645f25b51acf9e3d523d6bf8633938f9c5",
+                "reference": "ac0833645f25b51acf9e3d523d6bf8633938f9c5",
                 "shasum": ""
             },
             "require": {
@@ -5860,9 +5860,9 @@
             ],
             "support": {
                 "issues": "https://github.com/tighten/ziggy/issues",
-                "source": "https://github.com/tighten/ziggy/tree/v1.0.5"
+                "source": "https://github.com/tighten/ziggy/tree/v1.1.0"
             },
-            "time": "2021-02-05T15:30:28+00:00"
+            "time": "2021-04-02T17:17:05+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
