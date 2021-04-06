@@ -19,7 +19,6 @@ mix.js('resources/js/app.js', 'public/js')
         output : {chunkFilename: 'js/[name].js?id=[chunkhash]'},
         resolve: {
             alias: {
-                vue$: 'vue/dist/vue.runtime.esm-browser.js',
                 '@' : path.resolve('resources/js'),
                 ziggy: path.resolve('vendor/tightenco/ziggy/dist')
             },
@@ -45,5 +44,7 @@ if (! mix.inProduction()) {
 if( mix.inProduction()) {
     mix.version();
 }
+
+mix.sourceMaps()
 
 
