@@ -1,13 +1,16 @@
 // tailwind.config.js
 
 const defaultTheme = require('tailwindcss/defaultTheme')
+const colors = require('tailwindcss/colors')
 
 module.exports = {
+    mode: 'jit',
     purge: [
       './resources/js/**/*.vue',
       './resources/js/**/*.js',
     ],
     theme: {
+        colors,
         extend: {
             fontFamily: {
                 sans: ['Inter var', ...defaultTheme.fontFamily.sans],

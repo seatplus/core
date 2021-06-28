@@ -28,9 +28,7 @@ mix.js('resources/js/app.js', 'public/js')
         plugins: ['@babel/plugin-syntax-dynamic-import'],
     })
   .postCss('resources/css/app.css', 'public/css', [
-    require('postcss-import'),
-    require("@tailwindcss/jit")('./tailwind.config.js'),
-    require('autoprefixer'),
+      require('tailwindcss')
   ])
 
 if (! mix.inProduction()) {
