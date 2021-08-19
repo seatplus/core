@@ -10,7 +10,11 @@ module.exports = {
       './resources/js/**/*.js',
     ],
     theme: {
-        colors,
+        colors: {
+            ...colors,
+            gray: colors.coolGray,
+            coolGray: colors.gray
+        },
         extend: {
             fontFamily: {
                 sans: ['Inter var', ...defaultTheme.fontFamily.sans],
