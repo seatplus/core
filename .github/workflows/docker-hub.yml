@@ -33,4 +33,4 @@ jobs:
       -
         name: Inspect
         run: |
-          docker image inspect myimage:latest
+          docker image inspect seatplus/app:latest
