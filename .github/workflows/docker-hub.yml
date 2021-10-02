@@ -30,7 +30,3 @@ jobs:
           context: .
           push: true
           tags: seatplus/app:latest
-      -
-        name: Inspect
-        run: |
-          docker image inspect seatplus/app:latest
