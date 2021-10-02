@@ -21,7 +21,7 @@
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.0",
         "laravel/tinker": "^2.0",
-        "seatplus/web": "^0.8.0"
+        "seatplus/web": "^0.9.0"
     },
     "require-dev": {
         "facade/ignition": "^2.3.6",
