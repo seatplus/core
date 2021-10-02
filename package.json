@@ -13,7 +13,7 @@
         "@vue/compiler-sfc": "^3.0.7",
         "acorn": "^8.0",
         "autoprefixer": "^10.2.5",
-        "axios": "^0.21.1",
+        "axios": "^0.21.2",
         "eslint": "^7.22.0",
         "eslint-plugin-vue": "^7.7.0",
         "laravel-mix": "^6.0.13",
