@@ -50,8 +50,7 @@
         ]
     },
     "autoload-dev": {
-        "psr-4": {
-        }
+        "psr-4": []
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
