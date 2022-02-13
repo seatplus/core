@@ -14,7 +14,8 @@ require('laravel-mix-copy-watched');
  */
 
 mix.js('resources/js/app.js', 'public/js')
-    .vue()
+    .extract()
+    .vue({ version: 3 })
     .webpackConfig({
         output : {chunkFilename: 'js/[name].js?id=[chunkhash]'},
         resolve: {
@@ -33,24 +34,10 @@ mix.js('resources/js/app.js', 'public/js')
 
 if (! mix.inProduction()) {
     mix.copyWatched(
-        'vendor/seatplus/web/src/resources/js/**/*.{vue,js}',
+        'vendor/seatplus/web/resources/js/**/*.{vue,js}',
         'resources/js',
-        {base: 'vendor/seatplus/web/src/resources/js'}
-    ).copyWatched(
-        'vendor/seatplus/api/resources/js/**/*.{vue,js}',
-        'resources/js',
-        {base: 'vendor/seatplus/api/resources/js'}
+        {base: 'vendor/seatplus/web/resources/js'}
     )
-        /*.copyWatched(
-            'vendor/seatplus/notifications/resources/js/!**!/!*.{vue,js}',
-            'resources/js',
-            {base: 'vendor/seatplus/notifications/resources/js'}
-        )
-        .copyWatched(
-            'vendor/seatplus/telegram-channel/resources/js/!**!/!*.{vue,js}',
-            'resources/js',
-            {base: 'vendor/seatplus/telegram-channel/resources/js'}
-        )*/
 
 }
 
