@@ -16,7 +16,7 @@ jobs:
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2 #https://github.com/shivammathur/setup-php
       with:
-        php-version: '8.0'
+        php-version: '8.1'
         extensions: mbstring, dom, fileinfo
     - name: Redis Server in GitHub Actions
       uses: supercharge/redis-github-action@1.1.0

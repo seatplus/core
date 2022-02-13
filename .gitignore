@@ -24,3 +24,8 @@ storage/clockwork/
 storage/eseye/
 
 storage/tinx/
+/public/css/
+/public/js/
+.php_cs
+.php_cs.cache
+.php-cs-fixer.cache
