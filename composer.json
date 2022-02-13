@@ -12,24 +12,6 @@
         "management"
     ],
     "license": "MIT",
-    "repositories": [
-      {
-        "type": "path",
-        "url": "../web"
-      },
-      {
-        "type": "path",
-        "url": "../auth"
-      },
-      {
-        "type": "path",
-        "url": "../eveapi"
-      },
-      {
-        "type": "path",
-        "url": "../api"
-      }
-    ],
     "require": {
         "php": "^8.1",
         "ext-json": "*",
