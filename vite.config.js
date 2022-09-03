@@ -17,15 +17,17 @@ export default defineConfig(({mode}) => {
             }
         },
         plugins: [
-            copy({
-                targets: [{
-                    src: 'vendor/seatplus/web/resources/js',
-                    dest: 'resources'
-                }],
-                //flatten: false,
-                verbose: true,
-                overwrite: true
-            }),
+            {
+                ...copy({
+                         targets: [{
+                             src: 'vendor/seatplus/web/resources/js',
+                             dest: 'resources'
+                         }],
+                         verbose: true,
+                         overwrite: true
+                     }),
+                apply: 'serve',
+            },
             laravel({
                 input: 'resources/js/app.js',
                 refresh: ['resources/js/**', 'vendor/seatplus/web/resources/js/**'],
