@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
-import copy from 'rollup-plugin-copy';
+import run from 'vite-plugin-run';
 
 export default defineConfig(({mode}) => {
     return {
@@ -17,17 +17,6 @@ export default defineConfig(({mode}) => {
             }
         },
         plugins: [
-            {
-                ...copy({
-                         targets: [{
-                             src: 'vendor/seatplus/web/resources/js',
-                             dest: 'resources'
-                         }],
-                         verbose: true,
-                         overwrite: true
-                     }),
-                apply: 'serve',
-            },
             laravel({
                 input: 'resources/js/app.js',
                 refresh: ['resources/js/**', 'vendor/seatplus/web/resources/js/**'],
@@ -40,6 +29,14 @@ export default defineConfig(({mode}) => {
                     },
                 },
             }),
+            run([
+                {
+                    startup: false,
+                    name: 'copy vendor',
+                    run: ['php', 'artisan', 'vendor:publish', '--tag=web', '--force'],
+                    condition: (file) => file.includes('vendor/seatplus/web/resources/js/'),
+                }
+            ])
         ],
         resolve: {
             alias: {
