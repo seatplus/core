@@ -14,7 +14,7 @@ _ide_helper.php
 # web related
 tailwind.config.js
 postcss.config.js
-vitamin.config.js
+vite.config.js
 
 /public/img/
 /public/css/
