@@ -10,7 +10,16 @@ yarn-error.log
 .idea
 .phpstorm.meta.php
 _ide_helper.php
+
+# web related
+tailwind.config.js
+postcss.config.js
+vite.config.js
+
 /public/img/
+/public/css/
+/public/js/
+
 !/composer.lock
 
 cache/
@@ -24,8 +33,7 @@ storage/clockwork/
 storage/eseye/
 
 storage/tinx/
-/public/css/
-/public/js/
+
 .php_cs
 .php_cs.cache
 .php-cs-fixer.cache

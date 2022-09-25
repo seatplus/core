@@ -20,7 +20,7 @@
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^9.0",
         "laravel/tinker": "^2.7",
-        "seatplus/web": "^1.0"
+        "seatplus/web": "^2.0"
     },
     "require-dev": {
         "mockery/mockery": "^1.4.4",
@@ -32,7 +32,10 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
     },
     "extra": {
         "laravel": {
@@ -66,6 +69,7 @@
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
+            "@php artisan vendor:publish --tag=web-static --force",
             "@php artisan vendor:publish --tag=web --force"
         ]
     }
