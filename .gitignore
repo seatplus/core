@@ -10,7 +10,11 @@ yarn-error.log
 .idea
 .phpstorm.meta.php
 _ide_helper.php
+
+# web related
 tailwind.config.js
+postcss.config.js
+vitamin.config.js
 
 /public/img/
 /public/css/
