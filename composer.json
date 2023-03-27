@@ -12,6 +12,12 @@
         "management"
     ],
     "license": "MIT",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../packages/*"
+        }
+    ],
     "require": {
         "php": "^8.1",
         "ext-json": "*",
@@ -19,7 +25,7 @@
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.0",
         "laravel/tinker": "^2.8",
-        "seatplus/web": "^3.0"
+        "seatplus/web": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
@@ -47,12 +53,12 @@
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
-            "@php artisan lang:publish"
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
         ],
         "post-update-cmd": [
+            "@php artisan lang:publish",
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
             "@php artisan vendor:publish --tag=web-static --force",
             "@php artisan vendor:publish --tag=web --force"
