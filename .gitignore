@@ -31,3 +31,5 @@ _ide_helper.php
 package-lock.json
 /resources/
 /lang
+
+/packages/

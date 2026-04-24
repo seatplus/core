@@ -13,19 +13,25 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "ext-json": "*",
         "ext-redis": "*",
         "guzzlehttp/guzzle": "^7.2",
-        "laravel/framework": "^10.0",
+        "laravel/framework": "^11.0",
         "laravel/tinker": "^2.8",
-        "seatplus/web": "^4.0",
-        "symfony/process": "^6.3.4"
+        "laravel/wayfinder": "^0.1.4",
+        "wikimedia/composer-merge-plugin": "^2.1"
+    },
+    "replace": {
+        "seatplus/web": "*",
+        "seatplus/auth": "*",
+        "seatplus/eveapi": "*",
+        "seatplus/esi-client": "*"
     },
     "require-dev": {
+        "barryvdh/laravel-ide-helper": "^3.0",
         "fakerphp/faker": "^1.9.1",
         "mockery/mockery": "^1.4.4",
-        "nunomaduro/collision": "^7.0",
         "phpunit/phpunit": "^10.0",
         "spatie/laravel-ignition": "^2.0"
     },
@@ -33,7 +39,10 @@
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "Database\\Seeders\\": "database/seeders/",
+            "Seatplus\\Eveapi\\": "packages/eveapi/src/",
+            "Seatplus\\Web\\": "packages/web/src/",
+            "Seatplus\\Auth\\": "packages/auth/src/"
         }
     },
     "autoload-dev": {
@@ -56,12 +65,33 @@
             "@php artisan lang:publish",
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
             "@php artisan vendor:publish --tag=web-static --force",
-            "@php artisan vendor:publish --tag=web --force"
+            "@php artisan vendor:publish --tag=web --force",
+            "Illuminate\\Foundation\\ComposerScripts::postUpdate",
+            "@php artisan ide-helper:generate",
+            "@php artisan ide-helper:meta"
         ]
     },
     "extra": {
         "laravel": {
-            "dont-discover": []
+            "dont-discover": [],
+            "providers": [
+                "Seatplus\\Web\\Providers\\WebServiceProvider",
+                "Seatplus\\Auth\\Providers\\AuthServiceProvider",
+                "Seatplus\\Eveapi\\Providers\\EveapiServiceProvider"
+            ]
+        },
+        "merge-plugin": {
+            "include": [
+                "packages/*/composer.json"
+            ],
+            "recurse": true,
+            "replace": false,
+            "ignore-duplicates": false,
+            "merge-dev": false,
+            "merge-extra": true,
+            "merge-extra-deep": true,
+            "merge-replace": true,
+            "merge-scripts": false
         }
     },
     "config": {
@@ -70,7 +100,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "wikimedia/composer-merge-plugin": true
         }
     },
     "minimum-stability": "dev",

@@ -186,6 +186,10 @@ return [
          * Package Service Providers...
          */
 
+        \Seatplus\Eveapi\EveapiServiceProvider::class,
+        \Seatplus\Web\WebServiceProvider::class,
+        \Seatplus\Auth\AuthenticationServiceProvider::class,
+
         /*
          * Application Service Providers...
          */
