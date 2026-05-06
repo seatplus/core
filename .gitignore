@@ -25,6 +25,13 @@ package.json
 tailwind.config.js
 postcss.config.js
 vite.config.js
+vite.config.mjs
+.agentbridge/
+.phpstorm.meta.php
+/logs/
+/packages/auth/
+/packages/esi-client/
+/packages/eveapi/
 
 composer.lock
 _ide_helper.php
