@@ -227,6 +227,58 @@ All packages enforce:
 - **PHPStan/Larastan** static analysis
 - **Laravel Pint** (PSR-12) formatting
 
+## Code Style — Spatie Guidelines
+
+Follow the [Spatie PHP/Laravel coding guidelines](https://spatie.be/guidelines/laravel) in all PHP code. Key rules that apply here:
+
+### Strings
+Prefer string interpolation over `sprintf` and the `.` operator. Extract function-call results to a variable first when they cannot be embedded in `{…}` directly.
+```php
+// ✅
+$greeting = "Hi, I am {$name}.";
+$message = "Request for {$method} -> {$uri}";
+
+// ❌
+$greeting = 'Hi, I am ' . $name . '.';
+$message = sprintf('Request for %s -> %s', $method, $uri);
+```
+
+### Types
+- Use short nullable notation: `?string` not `string|null`.
+- Always declare return types, including `: void` for methods that return nothing.
+- Always type properties.
+
+### Docblocks
+- Omit docblocks for methods that are fully type-hinted (unless adding context beyond the signature).
+- Single-line docblocks preferred. Never use a description that just restates the method name.
+- Only use `@throws` when the exception is part of the documented contract.
+
+### Constructor property promotion
+Use promoted constructor parameters. Each on its own line with a trailing comma:
+```php
+public function __construct(
+    protected string $firstArgument,
+    protected string $secondArgument,
+) {}
+```
+
+### Naming
+- Methods and properties: `camelCase` (including private/protected — no snake_case).
+- Config keys and database columns: `snake_case`.
+
+### If statements & flow control
+- Always use curly brackets.
+- Happy path last: put early-return guard clauses first.
+- Avoid `else` — use early returns or ternary instead.
+- Prefer separate `if` statements over compound `&&`/`||` conditions for better debuggability.
+
+### Comments
+Avoid comments that restate what the code already says. Write expressive code instead. Comments should only explain *why*, not *what*.
+
+### Whitespace
+- Blank lines between distinct statements for readability.
+- No extra blank lines inside `{}` brackets.
+
 ## Testing Conventions
 
 - Package tests use [Orchestra Testbench](https://packages.tools/testbench) with `LazilyRefreshDatabase`.
