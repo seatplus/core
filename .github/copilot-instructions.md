@@ -213,6 +213,18 @@ vendor/bin/pest tests/Unit/Services/SomeServiceTest.php
 vendor/bin/pest --filter "test name"
 ```
 
+### Line coverage (local, Laravel Herd)
+
+`composer run test:unit-coverage` uses `XDEBUG_MODE=coverage` but Herd only activates Xdebug on-demand for **web requests** — CLI PHP bypasses Herd's proxy, so the extension is never injected. To run line coverage from the CLI without permanently enabling Xdebug in Herd, load it inline:
+
+```bash
+php -d zend_extension=/Applications/Herd.app/Contents/Resources/xdebug/xdebug-85-arm64.so \
+    -d xdebug.mode=coverage \
+    vendor/bin/pest --coverage
+```
+
+Adjust the filename for the active PHP version and architecture (e.g. `xdebug-83-arm64.so`, `xdebug-85-x86.so`). The extension files live at `/Applications/Herd.app/Contents/Resources/xdebug/`.
+
 Root-level tests (array cache + sync queue, no PostgreSQL):
 ```bash
 ./vendor/bin/phpunit
