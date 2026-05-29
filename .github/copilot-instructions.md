@@ -1,8 +1,82 @@
 # Copilot Instructions
 
+## Root Application Stack
+
+This is a Laravel 13 / PHP 8.5 application. Ensure all code targets these exact versions:
+
+| Package | Version |
+|---------|---------|
+| php | 8.5 |
+| laravel/framework | v13 |
+| inertiajs/inertia-laravel | v3 |
+| @inertiajs/vue3 | v3 |
+| vue | v3 |
+| laravel/horizon | v5 |
+| laravel/socialite | v5 |
+| laravel/wayfinder | v0 |
+| laravel/boost | v2 |
+| phpunit/phpunit | v11 |
+| tailwindcss | v3 |
+| eslint | v9 |
+
+---
+
+## AI Skills
+
+This project has domain-specific skills in `.github/skills/`. **Activate the relevant skill before working in that domain** — don't wait until stuck:
+
+- `configuring-horizon` — Horizon supervisor, queue config, dashboard
+- `inertia-vue-development` — Vue pages, forms, `<Link>`, `useForm`, deferred props, prefetching
+- `laravel-best-practices` — controllers, models, migrations, Eloquent, caching, auth
+- `socialite-development` — OAuth social login
+- `tailwindcss-development` — any task involving Tailwind utility classes
+- `wayfinder-development` — connecting frontend to backend routes/controllers
+
+---
+
+## Laravel Boost MCP Tools
+
+Prefer these Boost tools over manual shell commands or file reads:
+
+- **`search-docs`** — always call this before making code changes. Returns version-specific docs for installed packages. Pass `packages` array to scope results. Use multiple broad topic queries: `['rate limiting', 'routing rate limiting', 'routing']`. Don't add package names to queries.
+  - AND logic: `rate limit` matches both words
+  - Exact phrase: `"infinite scroll"` requires adjacent words
+  - OR logic: use multiple queries
+- **`database-query`** — run read-only SQL instead of tinker
+- **`database-schema`** — inspect table structure before writing migrations
+- **`get-absolute-url`** — always use before sharing a URL with the user
+- **`browser-logs`** — read browser errors; only recent entries are useful
+
+### Artisan
+
+Run Artisan commands directly via CLI. Use `php artisan list` to discover commands and `--help` to check parameters. Inspect routes with `php artisan route:list` (filter: `--method=GET`, `--name=`, `--path=`, `--except-vendor`). Read config with `php artisan config:show app.name`.
+
+### Tinker
+
+For debugging only. Never create models without approval — prefer tests with factories. Always single-quote to prevent shell expansion:
+```bash
+php artisan tinker --execute 'User::where("active", true)->count();'
+```
+
+---
+
+## Conventions
+
+- Follow all existing code conventions in the application. Check sibling files for correct structure, approach, and naming before creating anything new.
+- Use descriptive names: `isRegisteredForDiscounts`, not `discount()`.
+- Check for existing components to reuse before writing a new one.
+- Do not create verification scripts or use tinker when tests cover that functionality — unit and feature tests are more important.
+- Do not change the application's dependencies without approval.
+- Stick to the existing directory structure; do not create new base folders without approval.
+- Do not create documentation files unless explicitly requested.
+- Be concise in explanations — focus on what's important, not obvious details.
+- If a frontend change isn't reflected in the UI, the user may need to run `npm run build`, `npm run dev`, or `composer run dev` — ask them.
+
+---
+
 ## Project Overview
 
-Seatplus Core is an EVE Online management platform built on Laravel 11. It handles character, corporation, and alliance data via the EVE Swagger Interface (ESI). The codebase is a **monorepo** of four internal packages with a strict one-way dependency hierarchy, managed via `wikimedia/composer-merge-plugin`.
+Seatplus Core is an EVE Online management platform built on Laravel 13. It handles character, corporation, and alliance data via the EVE Swagger Interface (ESI). The codebase is a **monorepo** of four internal packages with a strict one-way dependency hierarchy, managed via `wikimedia/composer-merge-plugin`.
 
 ## Package Hierarchy
 
@@ -153,10 +227,20 @@ class CharacterInfoJob extends EsiBase implements HasPathValuesInterface
 ## Web Package (Optional Frontend)
 
 - Pages live in `packages/web/resources/js/Pages/` as Vue SFCs.
-- Inertia.js bridges Laravel controllers to Vue — no separate API layer.
-- After route changes run `php artisan wayfinder:generate` to regenerate the typed route file.
+- Inertia.js bridges Laravel controllers to Vue — no separate API layer. Always activate the `inertia-vue-development` skill when working on Vue pages.
+- After route changes run `php artisan wayfinder:generate` to regenerate the typed route file. Import from `@/actions/` (controllers) or `@/routes/` (named routes).
 - JS/CSS assets are published to the root project via `php artisan vendor:publish --tag=web --force`.
 - Custom query macros `whereAffiliatedCorporations` and `whereAffiliatedCharacters` (registered in `WebServiceProvider`) apply affiliation joins; superusers bypass them.
+
+### Inertia v3 Key Changes
+
+- `Inertia::lazy()` / `LazyProp` removed → use `Inertia::optional()` instead.
+- Axios removed → use the built-in XHR client (`useHttp` hook) or install Axios separately.
+- `router.cancel()` → `router.cancelAll()`.
+- `future` config namespace removed — all v2 options are now always enabled.
+- Event renames: `invalid` → `httpException`, `exception` → `networkError`.
+- New in v3: `useHttp` for standalone HTTP requests, `useLayoutProps` hook, optimistic updates with auto-rollback, instant visits, SSR via `@inertiajs/vite` (no separate Node server in dev).
+- Deferred props: always add skeleton/loading state. `Inertia::optional()`, `Inertia::defer()`, `Inertia::merge()` work inside nested arrays with dot-notation paths.
 
 ### Recruitment System
 
@@ -277,6 +361,13 @@ public function __construct(
 ### Naming
 - Methods and properties: `camelCase` (including private/protected — no snake_case).
 - Config keys and database columns: `snake_case`.
+- Enum keys: `TitleCase` — e.g. `FavoritePerson`, `BestLake`, `Monthly`.
+
+### PHP-specific
+- Use curly braces for all control structures, even single-line bodies.
+- Use PHP 8.1+ constructor property promotion. Do not leave empty zero-parameter `__construct()` unless the constructor is private.
+- Prefer PHPDoc blocks over inline comments. Use array shape type definitions: `@param array{name: string, age: int} $data`.
+- Only add inline comments for exceptionally complex logic.
 
 ### If statements & flow control
 - Always use curly brackets.
@@ -299,6 +390,13 @@ Avoid comments that restate what the code already says. Write expressive code in
 - `Model::shouldBeStrict()` is set in `setUp()`.
 - `Queue::fake()` is called globally — assert dispatched jobs, don't execute them.
 - Helper functions in `tests/Pest.php`: `faker()`, `assignPermissionToTestUser()`, `updateRefreshTokenWithScopes()`.
+- When creating models for tests, use factories and check for custom states before manually setting attributes.
+- Faker: use `$this->faker->word()` or `fake()->randomDigit()` — follow the file's existing convention.
+- Do not create verification scripts or use tinker when a test covers the same behaviour.
+- Write tests with `php artisan make:test {name}` (feature) or `php artisan make:test --unit {name}`. Most tests should be feature tests.
+- After every test change, run that specific test first. When passing, offer to run the full suite.
+- Tests should cover all happy paths, failure paths, and edge cases.
+- **Never remove test files without explicit approval** — they are not temporary files.
 
 ## Key Configuration
 
@@ -309,3 +407,11 @@ Avoid comments that restate what the code already says. Write expressive code in
 ## Autonomy Limits
 
 **Never merge PRs or create git tags/releases without explicit user approval.** Always create the PR, present it to the user, and wait for their go-ahead before merging or tagging.
+
+**Never create documentation files** unless explicitly requested by name and path.
+
+**Never add or change dependencies** (composer, npm) without approval.
+
+**Never create new top-level directories** in the project without approval.
+
+**Deployment**: The application can be deployed via [Laravel Cloud](https://cloud.laravel.com/).
