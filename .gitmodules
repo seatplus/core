@@ -1,0 +1,15 @@
+[submodule "packages/auth"]
+	path = packages/auth
+	url = https://github.com/seatplus/auth.git
+[submodule "packages/eveapi"]
+	path = packages/eveapi
+	url = https://github.com/seatplus/eveapi.git
+[submodule "packages/esi-client"]
+	path = packages/esi-client
+	url = https://github.com/seatplus/esi-client.git
+[submodule "packages/esi-schema"]
+	path = packages/esi-schema
+	url = https://github.com/seatplus/esi-schema.git
+[submodule "packages/web"]
+	path = packages/web
+	url = https://github.com/seatplus/web.git

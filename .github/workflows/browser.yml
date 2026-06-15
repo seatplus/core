@@ -1,0 +1,107 @@
+name: Browser
+
+on:
+  push:
+    branches: [ "chore/merge-instructions" ]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  browser:
+    name: Browser Smoke Tests
+    runs-on: ubuntu-latest
+
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: laravel
+      DB_USERNAME: seatplus
+      DB_PASSWORD: secret
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: 6379
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: laravel
+          POSTGRES_USER: seatplus
+          POSTGRES_PASSWORD: secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U seatplus -d laravel"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      # Checks out core + all package submodules (auth/eveapi/esi-client/esi-schema/web)
+      # at their pinned commits — assembling the full local app.
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, dom, fileinfo, pgsql, pdo_pgsql, redis, sockets
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Prepare app env
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      # The web package's frontend (package.json, vite/tailwind/postcss configs,
+      # resources/js, css) is published into core, not committed.
+      - name: Publish web package assets
+        run: |
+          php artisan vendor:publish --tag=web-static --force
+          php artisan vendor:publish --tag=web --force
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install npm dependencies + Playwright driver
+        run: |
+          npm install
+          npm install --save-dev playwright
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Install Playwright browser (chromium + system deps)
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser smoke tests
+        run: vendor/bin/pest tests/Browser --no-coverage
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-screenshots
+          path: tests/Browser/Screenshots/
+          if-no-files-found: warn

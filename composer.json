@@ -13,26 +13,34 @@
     ],
     "license": "MIT",
     "repositories": [
+        {"type": "path", "url": "packages/esi-schema"},
+        {"type": "path", "url": "packages/esi-client"},
         {"type": "path", "url": "packages/auth"},
         {"type": "path", "url": "packages/eveapi"},
         {"type": "path", "url": "packages/web"}
     ],
     "require": {
-        "php": "^8.3",
+        "php": "^8.5",
         "ext-json": "*",
         "ext-redis": "*",
         "guzzlehttp/guzzle": "^7.2",
-        "laravel/framework": "^11.0",
-        "laravel/tinker": "^2.8",
-        "seatplus/web": "dev-web/feat/wayfinder-migration",
+        "laravel/framework": "^13.0",
+        "laravel/tinker": "^3.0",
+        "seatplus/web": "^5.0",
         "symfony/process": "^7.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
+        "laravel/boost": "^2.4",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.1",
-        "phpunit/phpunit": "^11.0",
-        "spatie/laravel-ignition": "^2.0"
+        "pestphp/pest": "^4",
+        "pestphp/pest-plugin-browser": "^4.3",
+        "pestphp/pest-plugin-laravel": "^4",
+        "phpunit/phpunit": "^12.5",
+        "spatie/guidelines-skills": "^1.0",
+        "spatie/laravel-ignition": "^2.0",
+        "wikimedia/composer-merge-plugin": "^2.1"
     },
     "autoload": {
         "psr-4": {

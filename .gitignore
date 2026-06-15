@@ -27,14 +27,15 @@ postcss.config.js
 vite.config.js
 vite.config.mjs
 .agentbridge/
+.ai/
+.remember/
+.claude/settings.local.json
 .phpstorm.meta.php
 /logs/
-/packages/auth/
-/packages/esi-client/
-/packages/eveapi/
 
 composer.lock
 _ide_helper.php
 package-lock.json
 /resources/
 /lang
+tests/Browser/Screenshots/
