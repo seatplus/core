@@ -33,7 +33,6 @@ vite.config.mjs
 .phpstorm.meta.php
 /logs/
 
-composer.lock
 _ide_helper.php
 package-lock.json
 /resources/
