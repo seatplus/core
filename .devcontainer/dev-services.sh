@@ -11,16 +11,16 @@
 # Vite from writing public/hot, which would flip the app into dev mode under the
 # build-based browser tests).
 #
-# Idempotency uses a pidfile + `kill -0`, not a process-name match: this container has
-# no pgrep/pkill/ps, and Horizon retitles its own process (so it isn't findable as
-# "artisan horizon"). Pidfiles live in /tmp (container-ephemeral) so a container
-# restart starts clean with no stale-PID false positives.
+# Pidfiles are PER-USER (they include the uid). postStartCommand may run as root while
+# a developer runs this manually as 'dev'; per-user paths mean each owner only ever
+# reads/writes/removes its own pidfile, so neither hits "operation not permitted" on the
+# other's file. (/tmp is container-ephemeral → no stale PIDs across container restarts.)
 set -uo pipefail
 
 cd /workspace || exit 0
 mkdir -p storage/logs
 
-pidfile() { echo "/tmp/dev-service-$1.pid"; }
+pidfile() { echo "/tmp/dev-service-$1.$(id -u).pid"; }
 
 is_running() {
     local f
@@ -28,30 +28,54 @@ is_running() {
     [ -f "$f" ] && kill -0 "$(cat "$f" 2>/dev/null)" 2>/dev/null
 }
 
+# Kill our own processes whose command line matches a pattern. This image has no
+# pgrep/pkill/ps, so scan /proc directly. Used to catch untracked schedule:work orphans;
+# Horizon retitles its process (not matchable) and is stopped via horizon:terminate.
+kill_matching() {
+    local pattern="$1" d p cmd
+    for d in /proc/[0-9]*; do
+        p=${d#/proc/}
+        [ "$p" = "$$" ] && continue
+        cmd=$(tr '\0' ' ' <"$d/cmdline" 2>/dev/null) || continue
+        # Only the PHP worker itself (cmdline begins with the php binary) — never a
+        # shell/tool that merely mentions the pattern (which would kill the caller).
+        case "$cmd" in
+            php\ *|*/php\ *) : ;;
+            *) continue ;;
+        esac
+        case "$cmd" in
+            *"$pattern"*) kill "$p" 2>/dev/null || true ;;
+        esac
+    done
+}
+
 start_one() {
     local name="$1"
     shift
     if is_running "$name"; then
-        echo "[$name] already running (pid $(cat "$(pidfile "$name")"))"
+        echo "[$name] already running (pid $(cat "$(pidfile "$name")" 2>/dev/null))"
         return
     fi
     echo "[$name] starting → storage/logs/$name.log"
     nohup "$@" >>"storage/logs/$name.log" 2>&1 &
-    echo $! >"$(pidfile "$name")"
+    echo $! >"$(pidfile "$name")" 2>/dev/null || true
 }
 
 stop_one() {
     local name="$1" f pid
-    # Horizon: ask it to drain the current job and shut its whole tree down gracefully.
+    # Horizon: drain the current job and shut its whole tree down gracefully (Redis
+    # signal — works regardless of which user owns the master process).
     if [ "$name" = horizon ]; then
-        php artisan horizon:terminate >/dev/null 2>&1
+        php artisan horizon:terminate >/dev/null 2>&1 || true
+    fi
+    # schedule:work has no graceful-stop command; kill any of our instances directly.
+    if [ "$name" = schedule ]; then
+        kill_matching 'artisan schedule:work'
     fi
     f=$(pidfile "$name")
-    pid=$(cat "$f" 2>/dev/null)
-    if [ -n "${pid:-}" ]; then
-        kill "$pid" 2>/dev/null
-    fi
-    rm -f "$f"
+    pid=$(cat "$f" 2>/dev/null || true)
+    [ -n "${pid:-}" ] && kill "$pid" 2>/dev/null || true
+    rm -f "$f" 2>/dev/null || true
     echo "[$name] stopped"
 }
 
