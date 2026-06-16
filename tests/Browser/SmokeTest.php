@@ -1,20 +1,13 @@
 <?php
 
 /*
- * KNOWN-FAILING (intentional, true positive) — do not "fix" by relaxing the assertion.
+ * Smoke test for the assembled app's login page — the first browser test in core's
+ * cross-package regression suite. It boots the whole app (all package submodules,
+ * built web assets) and asserts the real /login renders: no JS/console/page errors
+ * (assertNoSmoke) and the expected content (assertSee), capturing a screenshot.
  *
- * This test currently fails: /login renders blank because the assembled app pairs
- * inertia-laravel v3 (server) with @inertiajs/vue3 ^1 (client, pinned in
- * packages/web/package.json). The v3 server emits the page payload in a separate
- *   <script data-page="app" type="application/json">…</script><div id="app"></div>
- * (CSP-friendly format), but the v1 client reads it from `el.dataset.page` on the
- * now-empty #app div — so it mounts nothing. No JS error is thrown, which is why
- * assertNoSmoke() passes while the page is empty.
- *
- * This is the cross-package regression the core browser suite exists to catch.
- * Fix = upgrade the web client to @inertiajs/vue3 ^2 (roadmap "PR3"), tracked as a
- * dedicated web PR. Verified locally: with the v2 client the login page renders and
- * this test passes (3 assertions).
+ * This caught the inertia-laravel v3 (server) vs @inertiajs/vue3 v1 (client)
+ * mismatch that blanked every page; resolved by the web v2 client upgrade.
  */
 it('renders the login page', function () {
     $page = visit('/login');
