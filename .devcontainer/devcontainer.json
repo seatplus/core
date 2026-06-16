@@ -58,6 +58,17 @@
     }
   },
 
-  // Install PHP and JS deps on first container start.
-  "postCreateCommand": "composer install --no-interaction && ([ -f packages/web/package.json ] && cd packages/web && npm install || true)"
+  // Backend-only container: no ports, no npm, no node_modules. Frontend dev + Vite HMR
+  // run natively on the Mac (Herd); browser tests + screenshots run in CI (and optionally
+  // on the Mac). Do NOT run npm/vite here — it would hit the Mac's darwin node_modules
+  // over the bind mount and throw ESM "wrong platform" errors.
+
+  // First container start: install PHP deps + ensure an app key. That's all the backend
+  // (package tests, Horizon, scheduler) needs; vendor/ is shared via the bind mount.
+  "postCreateCommand": "composer install --no-interaction && ([ -f .env ] || (cp .env.example .env && php artisan key:generate --no-interaction))",
+
+  // Every container start: auto-start the Horizon queue worker + scheduler in the
+  // background (idempotent; logs to storage/logs/). `serve` and `npm run dev` stay
+  // on demand. See .devcontainer/dev-services.sh.
+  "postStartCommand": "bash .devcontainer/dev-services.sh"
 }
