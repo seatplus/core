@@ -1,0 +1,74 @@
+{
+  "name": "seatplus-core",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      // Match your host UID so bind-mounted files have correct ownership.
+      // Run `id -u` on your Mac if unsure — 501 is the default for the first
+      // macOS user, override here if different.
+      "UID": "501"
+    }
+  },
+
+  // Official Claude Code devcontainer feature — handles install + correct permissions.
+  "features": {
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
+  },
+
+  // Mount only the project — home dir (1Password socket, browser, SSH) stays on host.
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "workspaceFolder": "/workspace",
+
+  // Herd services live on the Mac; host.docker.internal resolves to the host.
+  "containerEnv": {
+    "DB_HOST": "host.docker.internal",
+    "DB_PORT": "5432",
+    "DB_DATABASE": "seatplus",
+    "DB_USERNAME": "seatplus",
+    "DB_PASSWORD": "secret",
+    "REDIS_HOST": "host.docker.internal",
+    "REDIS_PORT": "6379",
+    "REDIS_PASSWORD": "null"
+  },
+
+  // Extra hosts so host.docker.internal is always available (Docker Desktop
+  // injects it automatically, this is a belt-and-suspenders fallback).
+  "runArgs": ["--add-host=host.docker.internal:host-gateway"],
+
+  // Named volumes persist state across container rebuilds.
+  // - claude-home:     ~/.claude auth token + memory so re-login is not needed
+  // - jetbrains-cache: PhpStorm indexes/caches so re-indexing is not needed
+  // - jetbrains-data:  PhpStorm plugins and IDE data
+  "mounts": [
+    "source=seatplus-claude-home,target=/home/dev/.claude,type=volume",
+    "source=seatplus-jetbrains-cache,target=/home/dev/.cache/JetBrains,type=volume",
+    "source=seatplus-jetbrains-data,target=/home/dev/.local/share/JetBrains,type=volume"
+  ],
+
+  "customizations": {
+    "jetbrains": {
+        "settings": {
+            "com.intellij:app:HttpConfigurable.use_proxy_pac": true,
+            "com.intellij:app:XmlEditorOptions.showCssInlineColorPreview": true
+        },
+        "backend": "PhpStorm",
+        "plugins": [
+            "org.jetbrains.plugins.vue"
+        ]
+    }
+  },
+
+  // Backend-only container: no ports, no npm, no node_modules. Frontend dev + Vite HMR
+  // run natively on the Mac (Herd); browser tests + screenshots run in CI (and optionally
+  // on the Mac). Do NOT run npm/vite here — it would hit the Mac's darwin node_modules
+  // over the bind mount and throw ESM "wrong platform" errors.
+
+  // First container start: install PHP deps + ensure an app key. That's all the backend
+  // (package tests, Horizon, scheduler) needs; vendor/ is shared via the bind mount.
+  "postCreateCommand": "composer install --no-interaction && ([ -f .env ] || (cp .env.example .env && php artisan key:generate --no-interaction))",
+
+  // Every container start: auto-start the Horizon queue worker + scheduler in the
+  // background (idempotent; logs to storage/logs/). `serve` and `npm run dev` stay
+  // on demand. See .devcontainer/dev-services.sh.
+  "postStartCommand": "bash .devcontainer/dev-services.sh"
+}

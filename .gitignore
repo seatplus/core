@@ -25,9 +25,22 @@ package.json
 tailwind.config.js
 postcss.config.js
 vite.config.js
+vite.config.mjs
+.agentbridge/
+.ai/
+.remember/
+.claude/settings.local.json
+.phpstorm.meta.php
+/logs/
 
-composer.lock
 _ide_helper.php
 package-lock.json
 /resources/
 /lang
+tests/Browser/Screenshots/
+
+# internal packages — local-dev checkouts only. composer path repos +
+# composer-merge-plugin resolve them into vendor/ when present; a plain
+# install pulls the published versions from Packagist instead. Populate by
+# cloning the sibling repos into packages/*.
+/packages/
