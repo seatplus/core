@@ -2,8 +2,9 @@ name: Browser
 
 on:
   push:
-    branches: [ "chore/merge-instructions" ]
+    branches: [ "5.x" ]
   pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -51,11 +52,9 @@ jobs:
           --health-retries 5
 
     steps:
-      # Checks out core + all package submodules (auth/eveapi/esi-client/esi-schema/web)
-      # at their pinned commits — assembling the full local app.
+      # Packages come from Packagist (composer), not submodules — a plain checkout
+      # + composer install assembles the whole app.
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -78,6 +77,15 @@ jobs:
         run: |
           php artisan vendor:publish --tag=web-static --force
           php artisan vendor:publish --tag=web --force
+
+      # Browser tests are authored in the web package and shipped in its dist;
+      # run them here against the assembled app (no-op until web ships tests/Browser).
+      - name: Pull in web-owned browser tests
+        run: |
+          if [ -d vendor/seatplus/web/tests/Browser ]; then
+            mkdir -p tests/Browser/web
+            cp -R vendor/seatplus/web/tests/Browser/. tests/Browser/web/
+          fi
 
       - name: Setup Node
         uses: actions/setup-node@v4

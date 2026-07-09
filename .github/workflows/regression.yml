@@ -1,0 +1,132 @@
+name: Release Regression
+
+# Nightly cross-package regression: pull the latest released seatplus/* packages
+# and re-run the browser suite against the assembled app. It is a no-op on nights
+# where nothing was released (composer.lock doesn't move). When a release lands,
+# a green run opens a bump PR; a red run is the regression alert.
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  regression:
+    name: seatplus/* release regression
+    runs-on: ubuntu-latest
+
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: laravel
+      DB_USERNAME: seatplus
+      DB_PASSWORD: secret
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: 6379
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: laravel
+          POSTGRES_USER: seatplus
+          POSTGRES_PASSWORD: secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U seatplus -d laravel"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, dom, fileinfo, pgsql, pdo_pgsql, redis, sockets
+          coverage: none
+
+      - name: Update seatplus/* to latest release
+        run: composer update "seatplus/*" -W --no-interaction --no-scripts
+
+      - name: Detect whether anything was released
+        id: changed
+        run: |
+          if git diff --quiet composer.lock; then
+            echo "No seatplus/* release since the last run — nothing to test."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ----- everything below runs only when a release moved the lock -----
+
+      - name: Prepare app env
+        if: steps.changed.outputs.changed == 'true'
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan vendor:publish --tag=web-static --force
+          php artisan vendor:publish --tag=web --force
+
+      - name: Pull in web-owned browser tests
+        if: steps.changed.outputs.changed == 'true'
+        run: |
+          if [ -d vendor/seatplus/web/tests/Browser ]; then
+            mkdir -p tests/Browser/web
+            cp -R vendor/seatplus/web/tests/Browser/. tests/Browser/web/
+          fi
+
+      - name: Setup Node
+        if: steps.changed.outputs.changed == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build assets + Playwright
+        if: steps.changed.outputs.changed == 'true'
+        run: |
+          npm install
+          npm install --save-dev playwright
+          npm run build
+          npx playwright install --with-deps chromium
+
+      - name: Run browser regression suite
+        if: steps.changed.outputs.changed == 'true'
+        run: vendor/bin/pest tests/Browser --no-coverage
+
+      - name: Upload screenshots
+        if: steps.changed.outputs.changed == 'true' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-screenshots
+          path: tests/Browser/Screenshots/
+          if-no-files-found: warn
+
+      # Reached only if the suite passed (a failing suite fails the job = regression alert).
+      - name: Open bump PR
+        if: steps.changed.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore: bump seatplus/* to latest release"
+          title: "chore: bump seatplus/* to latest release"
+          branch: chore/seatplus-bump
+          delete-branch: true
+          body: |
+            Automated nightly bump — a new `seatplus/*` release moved `composer.lock`
+            and the browser regression suite passed against the updated versions.
