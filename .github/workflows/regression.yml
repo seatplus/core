@@ -117,6 +117,7 @@ jobs:
           name: regression-screenshots
           path: tests/Browser/Screenshots/
           if-no-files-found: warn
+          retention-days: 7
 
       # Reached only if the suite passed (a failing suite fails the job = regression alert).
       - name: Open bump PR

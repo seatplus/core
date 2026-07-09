@@ -113,3 +113,4 @@ jobs:
           name: browser-screenshots
           path: tests/Browser/Screenshots/
           if-no-files-found: warn
+          retention-days: 7
