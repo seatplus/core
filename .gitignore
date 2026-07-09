@@ -38,3 +38,9 @@ package-lock.json
 /resources/
 /lang
 tests/Browser/Screenshots/
+
+# internal packages — local-dev checkouts only. composer path repos +
+# composer-merge-plugin resolve them into vendor/ when present; a plain
+# install pulls the published versions from Packagist instead. Populate by
+# cloning the sibling repos into packages/*.
+/packages/
