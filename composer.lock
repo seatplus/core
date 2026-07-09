@@ -4710,16 +4710,16 @@
         },
         {
             "name": "seatplus/web",
-            "version": "5.0.0",
+            "version": "5.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/seatplus/web.git",
-                "reference": "00e0d835d22a66dc1c0f39eb48256ef5789b8dd1"
+                "reference": "66c88e03dd3f033f2f4c89e0f5e5cf32fb872bf3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/seatplus/web/zipball/00e0d835d22a66dc1c0f39eb48256ef5789b8dd1",
-                "reference": "00e0d835d22a66dc1c0f39eb48256ef5789b8dd1",
+                "url": "https://api.github.com/repos/seatplus/web/zipball/66c88e03dd3f033f2f4c89e0f5e5cf32fb872bf3",
+                "reference": "66c88e03dd3f033f2f4c89e0f5e5cf32fb872bf3",
                 "shasum": ""
             },
             "require": {
@@ -4774,9 +4774,9 @@
             "description": "Web frontend of seatplus",
             "support": {
                 "issues": "https://github.com/seatplus/web/issues",
-                "source": "https://github.com/seatplus/web/tree/5.0.0"
+                "source": "https://github.com/seatplus/web/tree/5.0.1"
             },
-            "time": "2026-07-09T18:04:08+00:00"
+            "time": "2026-07-09T21:14:02+00:00"
         },
         {
             "name": "socialiteproviders/eveonline",
