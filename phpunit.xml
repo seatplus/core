@@ -12,8 +12,16 @@
     <env name="APP_ENV" value="testing"/>
     <env name="BCRYPT_ROUNDS" value="4"/>
     <env name="CACHE_DRIVER" value="array"/>
-    <!-- <env name="DB_CONNECTION" value="sqlite"/> -->
-    <!-- <env name="DB_DATABASE" value=":memory:"/> -->
+    <!--
+      Dedicated test database. Tests use RefreshDatabase (migrate:fresh), so they
+      MUST NOT run against the dev database (DB_DATABASE=seatplus) or they wipe it.
+      force="true" pins the test DB regardless of any DB_DATABASE env var set by the
+      shell / dev container / CI. Create it once: `createdb seatplus_testing`
+      (same host/user/password as dev). CI must provide a `seatplus_testing` database.
+      SQLite :memory: is not usable here — pgsql-specific migrations + the Pest
+      browser in-process server sharing the connection.
+    -->
+    <env name="DB_DATABASE" value="seatplus_testing" force="true"/>
     <env name="MAIL_MAILER" value="array"/>
     <env name="QUEUE_CONNECTION" value="sync"/>
     <env name="SESSION_DRIVER" value="array"/>

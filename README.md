@@ -67,3 +67,15 @@ The source of truth lives in `seatplus/web`.
 
 Prerequisites: built frontend assets (`npm run build`) and the Playwright browser
 binaries. Screenshots from a run land in `tests/Browser/Screenshots/`.
+
+> ⚠️ **Dedicated test database.** These tests use `RefreshDatabase` (`migrate:fresh`),
+> so they must never run against the dev database — that would wipe it. `phpunit.xml`
+> pins the test DB to **`seatplus_testing`** (`force="true"`, so it holds regardless
+> of the `DB_DATABASE` env var). Create it once before running:
+>
+> ```bash
+> createdb seatplus_testing        # same host/user/password as the dev DB
+> ```
+>
+> CI must provide a `seatplus_testing` database for the browser job. SQLite `:memory:`
+> is not usable (pgsql-specific migrations + the in-process browser server).
