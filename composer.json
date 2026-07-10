@@ -63,7 +63,9 @@
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
             "@php artisan vendor:publish --tag=web-static --force",
             "@php artisan vendor:publish --tag=web --force"
-        ]
+        ],
+        "local:on": "@php -r \"copy('composer.local.json.example', 'composer.local.json');\"",
+        "local:off": "@php -r \"file_exists('composer.local.json') && unlink('composer.local.json');\""
     },
     "extra": {
         "laravel": {
@@ -71,7 +73,7 @@
         },
         "merge-plugin": {
             "include": [
-                "packages/*/composer.json"
+                "composer.local.json"
             ],
             "recurse": false,
             "replace": false,

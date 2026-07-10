@@ -44,3 +44,8 @@ tests/Browser/Screenshots/
 # install pulls the published versions from Packagist instead. Populate by
 # cloning the sibling repos into packages/*.
 /packages/
+
+# local composer override (path repos for packages/*). `composer run local:on`
+# to create it from composer.local.json.example; merge-plugin picks it up. Kept
+# out of git so CI/prod resolve seatplus/* from Packagist.
+/composer.local.json

@@ -1,0 +1,10 @@
+{
+    "//": "Local development override. Copy to composer.local.json (composer run local:on) to make composer resolve seatplus/* from the local packages/* checkouts instead of Packagist, then run composer update. composer.local.json is gitignored, so CI/prod stay on Packagist. Remove entries for any packages/* you have NOT checked out — a path repo whose directory is missing makes composer error.",
+    "repositories": [
+        { "type": "path", "url": "packages/esi-schema" },
+        { "type": "path", "url": "packages/esi-client" },
+        { "type": "path", "url": "packages/auth" },
+        { "type": "path", "url": "packages/eveapi" },
+        { "type": "path", "url": "packages/web" }
+    ]
+}
