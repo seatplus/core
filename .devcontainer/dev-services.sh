@@ -2,10 +2,16 @@
 # Background dev services in the dev container: the Horizon queue worker + the
 # scheduler. Run by devcontainer "postStartCommand" on every container start.
 #
-#   dev-services.sh [start]    start any not-already-running service (idempotent)
+#   dev-services.sh [start]    start a supervisor that keeps every service running,
+#                              restarting any that stop (idempotent)
 #   dev-services.sh restart    restart all — REQUIRED to pick up changed job/schedule
 #                              code (a queue worker caches code in memory at boot)
-#   dev-services.sh stop       stop all
+#   dev-services.sh stop       stop the supervisor, then all services
+#
+# `start` launches a lightweight bash supervisor (dev-services.sh __supervise) that
+# every SUPERVISE_INTERVAL seconds re-checks each service and restarts it if the
+# process has died — so a crashed Horizon/scheduler comes back on its own (with the
+# current code). `stop` kills the supervisor first so it can't revive what it stops.
 #
 # Not started here: `php artisan serve` and `npm run dev` are run on demand (keeping
 # Vite from writing public/hot, which would flip the app into dev mode under the
@@ -16,6 +22,13 @@
 # reads/writes/removes its own pidfile, so neither hits "operation not permitted" on the
 # other's file. (/tmp is container-ephemeral → no stale PIDs across container restarts.)
 set -uo pipefail
+
+# Resolve our own absolute path before cd, so the supervisor can re-exec us
+# regardless of the caller's working directory.
+SELF=$(cd "$(dirname "$0")" && pwd)/$(basename "$0")
+
+# How often the supervisor re-checks the services (seconds).
+SUPERVISE_INTERVAL="${SUPERVISE_INTERVAL:-10}"
 
 cd /workspace || exit 0
 mkdir -p storage/logs
@@ -89,9 +102,43 @@ stop_all() {
     stop_one schedule
 }
 
+# The supervisor loop: keep every service running, restarting any that stopped.
+# Runs in the foreground (backgrounded by start_supervisor via nohup). start_one is
+# only called when a service is down, so a healthy loop is quiet.
+supervise_loop() {
+    echo "[supervisor] watching horizon + schedule every ${SUPERVISE_INTERVAL}s (pid $$)"
+    while :; do
+        is_running horizon  || start_one horizon  php artisan horizon
+        is_running schedule || start_one schedule php artisan schedule:work
+        sleep "$SUPERVISE_INTERVAL"
+    done
+}
+
+start_supervisor() {
+    if is_running supervisor; then
+        echo "[supervisor] already running (pid $(cat "$(pidfile supervisor)" 2>/dev/null))"
+        return
+    fi
+    echo "[supervisor] starting → storage/logs/supervisor.log"
+    nohup bash "$SELF" __supervise >>"storage/logs/supervisor.log" 2>&1 &
+    echo $! >"$(pidfile supervisor)" 2>/dev/null || true
+}
+
+# Stop the supervisor (so it won't revive services) but leave the services it
+# spawned running — those are separate processes stopped by stop_all.
+stop_supervisor() {
+    local f pid
+    f=$(pidfile supervisor)
+    pid=$(cat "$f" 2>/dev/null || true)
+    [ -n "${pid:-}" ] && kill "$pid" 2>/dev/null || true
+    rm -f "$f" 2>/dev/null || true
+    echo "[supervisor] stopped"
+}
+
 case "${1:-start}" in
-    start)   start_all ;;
-    stop)    stop_all ;;
-    restart) stop_all; sleep 2; start_all ;;
+    start)       start_supervisor ;;
+    stop)        stop_supervisor; stop_all ;;
+    restart)     stop_supervisor; stop_all; sleep 2; start_supervisor ;;
+    __supervise) supervise_loop ;;
     *) echo "usage: $0 [start|stop|restart]" >&2; exit 2 ;;
 esac
