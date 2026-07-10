@@ -63,6 +63,17 @@
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
             "@php artisan vendor:publish --tag=web-static --force",
             "@php artisan vendor:publish --tag=web --force"
+        ],
+        "local:on": "@php local-packages.php on",
+        "local:off": "@php local-packages.php off",
+        "browser:sync": "@php browser-tests.php",
+        "browser": [
+            "@browser:sync",
+            "vendor/bin/pest tests/Browser"
+        ],
+        "browser:debug": [
+            "@browser:sync",
+            "vendor/bin/pest tests/Browser --debug"
         ]
     },
     "extra": {
@@ -71,7 +82,7 @@
         },
         "merge-plugin": {
             "include": [
-                "packages/*/composer.json"
+                "composer.local.json"
             ],
             "recurse": false,
             "replace": false,

@@ -67,8 +67,9 @@
   // (package tests, Horizon, scheduler) needs; vendor/ is shared via the bind mount.
   "postCreateCommand": "composer install --no-interaction && ([ -f .env ] || (cp .env.example .env && php artisan key:generate --no-interaction))",
 
-  // Every container start: auto-start the Horizon queue worker + scheduler in the
-  // background (idempotent; logs to storage/logs/). `serve` and `npm run dev` stay
-  // on demand. See .devcontainer/dev-services.sh.
+  // Every container start: launch the dev-services supervisor, which starts the
+  // Horizon queue worker + scheduler and restarts either if it stops (idempotent;
+  // logs to storage/logs/). `serve` and `npm run dev` stay on demand.
+  // See .devcontainer/dev-services.sh.
   "postStartCommand": "bash .devcontainer/dev-services.sh"
 }

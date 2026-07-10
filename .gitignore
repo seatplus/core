@@ -38,9 +38,17 @@ package-lock.json
 /resources/
 /lang
 tests/Browser/Screenshots/
+# web-owned browser tests, synced in from the package by `composer run browser`
+# (browser-tests.php) and by CI — generated here, not committed.
+tests/Browser/web/
 
 # internal packages — local-dev checkouts only. composer path repos +
 # composer-merge-plugin resolve them into vendor/ when present; a plain
 # install pulls the published versions from Packagist instead. Populate by
 # cloning the sibling repos into packages/*.
 /packages/
+
+# local composer override (path repos for packages/*). `composer run local:on`
+# generates it from the checked-out packages/*; merge-plugin picks it up. Kept
+# out of git so CI/prod resolve seatplus/* from Packagist.
+/composer.local.json
