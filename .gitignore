@@ -46,6 +46,6 @@ tests/Browser/Screenshots/
 /packages/
 
 # local composer override (path repos for packages/*). `composer run local:on`
-# to create it from composer.local.json.example; merge-plugin picks it up. Kept
+# generates it from the checked-out packages/*; merge-plugin picks it up. Kept
 # out of git so CI/prod resolve seatplus/* from Packagist.
 /composer.local.json

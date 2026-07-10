@@ -64,8 +64,8 @@
             "@php artisan vendor:publish --tag=web-static --force",
             "@php artisan vendor:publish --tag=web --force"
         ],
-        "local:on": "@php -r \"copy('composer.local.json.example', 'composer.local.json');\"",
-        "local:off": "@php -r \"file_exists('composer.local.json') && unlink('composer.local.json');\""
+        "local:on": "@php local-packages.php on",
+        "local:off": "@php local-packages.php off"
     },
     "extra": {
         "laravel": {
