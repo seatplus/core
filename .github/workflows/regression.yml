@@ -53,6 +53,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
+        # Don't persist the checkout credential: actions/checkout@v6+ installs it via
+        # git includeIf directives, which collide with the Authorization header that
+        # create-pull-request sets later ("Duplicate header: Authorization" → HTTP 400
+        # on `git remote prune origin`). create-pull-request configures its own auth.
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
