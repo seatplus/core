@@ -74,28 +74,37 @@ implement `RoleServiceInterface` — always use the concrete service.
 
 ## ESI data layer (eveapi)
 
-**Flow:** a queued `EsiBase` job calls `$this->retrieve()` → `RetrieveFromEsiBase` builds an `EsiRequestContainer` and calls the `RetrieveEsiData` facade → esi-client fires the Guzzle request (RFC 7234 cache) and returns `EsiResponse` → `executeJob()` upserts models inside the DB transaction that `EsiBase::handle()` wraps.
+**Flow:** a queued `EsiJob` receives an `EsiClient` (container-injected into `handle()`), calls `self::OPERATION_CLASS::execute($esi, ...)` on its esi-schema operation class → esi-client fires the Guzzle request (RFC 7234 cache) and returns the typed result → `executeJob()` upserts models inside the DB transaction that `EsiJob::handle()` wraps. (Full rationale in `packages/eveapi/ARCHITECTURE.md`.)
 
-ESI jobs extend `EsiBase` (`ShouldQueue + ShouldBeUnique`, 3 tries, exponential backoff via Redis throttle), pass `method`/`endpoint`/`version` to the parent ctor, implement capability interfaces from `Seatplus\Eveapi\Esi\` as needed (`HasPathValuesInterface`+`HasPathValues`, `HasRequiredScopeInterface`, `HasQueryParametersInterface`, `HasRequestBodyInterface`), and override `tags()` (unique id + Horizon tag) and `executeJob(): void`.
+ESI jobs extend `EsiJob` (`ShouldQueue + ShouldBeUnique`) and declare a single `protected const string OPERATION_CLASS = SomeEsiSchemaClass::class` — the generated esi-schema class holds endpoint metadata (`REQUIRED_SCOPE`, `RATE_LIMIT_GROUP`, `RATE_LIMIT_MAX_TOKENS`/`RATE_LIMIT_WINDOW`, `CACHE_AGE`, `REQUIRED_ROLES`) so the job declares no `method`/`endpoint`/`version` and no capability traits. Each job overrides `tags()` (unique id + Horizon tag) and `executeJob(EsiClient $esi): void`.
+
+**Retry model:** `$tries = 0` (no fixed attempt cap) + `$maxExceptions = 3` (only genuine, rethrown errors count) + `retryUntil() = now()+30m` (absolute deadline). Rate-limit `release()`s are flow control, not failures, so a throttled job retries freely until its bucket refills — it never dies with `MaxAttemptsExceeded`. Tier-1 proactive throttling reads the **real per-endpoint quota** from `OPERATION_CLASS` (not a universal 1800) and is refill-aware.
 
 ```php
-class CharacterInfoJob extends EsiBase implements HasPathValuesInterface
+final class CharacterInfoJob extends EsiJob
 {
-    use HasPathValues;
+    protected const string OPERATION_CLASS = GetCharactersCharacterId::class;
 
-    public function __construct(public int $character_id)
+    public function __construct(public int $characterId) {}
+
+    #[\Override]
+    public function tags(): array
     {
-        parent::__construct('get', '/characters/{character_id}/', 'v5');
-        $this->setPathValues(['character_id' => $character_id]);
+        return ['character', 'info', "character_id:{$this->characterId}"];
     }
 
-    public function tags(): array { return ['character', 'info', "character_id:{$this->character_id}"]; }
-
-    public function executeJob(): void
+    #[\Override]
+    public function executeJob(EsiClient $esi): void
     {
-        $response = $this->retrieve();
-        if ($response->isCachedLoad()) return;
-        CharacterInfo::updateOrCreate(['character_id' => $this->character_id], [...]);
+        $response = self::OPERATION_CLASS::execute($esi, $this->characterId);
+        if ($response->isCachedLoad) {
+            return;
+        }
+
+        CharacterInfo::updateOrCreate(['character_id' => $this->characterId], [
+            'name' => $response->name,
+            // ...
+        ]);
     }
 }
 ```
@@ -108,11 +117,15 @@ class CharacterInfoJob extends EsiBase implements HasPathValuesInterface
 ## Web package (optional frontend)
 
 - Vue SFC pages in `packages/web/resources/js/Pages/`; Inertia bridges controllers to Vue (no separate API). Activate `inertia-vue-development` for Vue work.
-- After route changes run `php artisan wayfinder:generate`; import from `@/actions/` (controllers) or `@/routes/` (named routes).
+- Wayfinder: import typed routes from `@/actions/` (controllers) or `@/routes/` (named routes). These files are **gitignored + generated** — run `php artisan wayfinder:generate` after route changes. CI generates them in the "Browser (vs core)" job (which assembles the full app) before the build; the package's own CI job is **"Frontend Lint" only** (no `vite build`) — a package has no app to generate `@/actions` against, so the real production build is validated against core.
 - Publish assets to the root app: `php artisan vendor:publish --tag=web --force`.
 - Query macros `whereAffiliatedCorporations` / `whereAffiliatedCharacters` (registered in `WebServiceProvider`) apply affiliation joins; superusers bypass them.
 
-**Inertia v3 changes:** `Inertia::lazy()`/`LazyProp` → `Inertia::optional()`; Axios removed → built-in XHR / `useHttp`; `router.cancel()` → `router.cancelAll()`; `future` namespace gone (all v2 opts always on); events `invalid`→`httpException`, `exception`→`networkError`; new `useHttp`, `useLayoutProps`, optimistic updates with rollback, instant visits, SSR via `@inertiajs/vite`. Deferred props need a skeleton/loading state; prop helpers work inside nested arrays via dot-notation.
+**Infinite scroll (Inertia v3, roadmap B1):** lists use Inertia's native `<InfiniteScroll>` (from `@inertiajs/vue3`) over a page-level scroll prop — `Inertia::scroll(fn () => …->paginate(pageName:))`, one prop per character/entity with its own `pageName`, rendered inside a `scroll-region=""` container with `items-element` pointing at the row `<ul>`. Migrated: wallet (journal/transactions), mails, contracts. The legacy axios helper (`useInfinityScrolling.js` / `InfiniteLoadingHelper.vue`) is being retired list-by-list — still used by assets, corp history, member tracking, ACL, recruitment. See `docs/ROADMAP.md`.
+
+**Axios/Ziggy removal (roadmap B2/B3):** new/migrated code avoids `axios` and Ziggy `route()`. For the few non-Inertia JSON endpoints (batch dispatch/status, id resolve) use `resources/js/Functions/http.js` (`getJson`/`post` — native fetch that sends the `XSRF-TOKEN` cookie as `X-XSRF-TOKEN`, as axios did); build URLs from Wayfinder (`@/actions/…`), not `route()`.
+
+**Inertia v3 changes:** `Inertia::lazy()`/`LazyProp` → `Inertia::optional()`; Axios removed → use the native-fetch wrapper `Functions/http.js` (**NB: the installed `@inertiajs/vue3` is v2 — there is no `useHttp` hook, despite the inertia-laravel v3 server**); `router.cancel()` → `router.cancelAll()`; `future` namespace gone (all v2 opts always on); events `invalid`→`httpException`, `exception`→`networkError`; `useLayoutProps`, optimistic updates with rollback, instant visits, SSR via `@inertiajs/vite`. Deferred props need a skeleton/loading state; prop helpers work inside nested arrays via dot-notation. Persistent layout: `app.js` assigns `SingleColumnLayout` only when `layout === undefined` (never `??=`), so a page opting out with `layout: null` (e.g. mails → own `MultiColumnLayout`) isn't double-wrapped with a second sidebar.
 
 **Recruitment:** corps open via an eveapi `Enlistments` record; web's `Enlistment` adds a polymorphic **watchlist** (systems/regions/types/groups/categories). `Application` is polymorphic (`User` account-wide or `CharacterInfo` single-char), statuses `open`/`accepted`/`rejected`, multi-step review (`steps_count` vs `decision_count`), recruiter `ImpersonateRecruit` (User-type open apps only) and on-demand `UpdateCharacter`.
 
@@ -161,6 +174,13 @@ cd packages/auth        # or eveapi, esi-client, web
 composer run test       # lint + types + type-coverage + unit
 vendor/bin/pest --filter "test name"
 ```
+
+**DB isolation (critical):** every package's `phpunit.xml` pins
+`<env name="DB_DATABASE" value="laravel" force="true"/>`. The `force="true"` is
+non-negotiable — the dev shell/container exports `DB_DATABASE=seatplus`, and without
+`force` that env var overrides the test config, so `LazilyRefreshDatabase` runs
+`migrate:fresh` against the **dev** database and wipes it. Tests must never touch
+`seatplus`. Browser tests run in core against the `laravel` DB too.
 
 Root-level tests (array cache + sync queue, no PostgreSQL): `./vendor/bin/phpunit`.
 **100% type coverage is enforced** (`pest --type-coverage --min=100`); all packages
