@@ -66,7 +66,10 @@ return [
             'driver' => 'redis',
             'connection' => 'default',
             'queue' => env('REDIS_QUEUE', 'default'),
-            'retry_after' => 90,
+            // Must exceed the longest Horizon worker timeout (production: 900s, see
+            // EveapiServiceProvider) so a slow job (e.g. SdeImportJob's full CCP SDE
+            // import) is never re-released and double-processed into MaxAttemptsExceeded.
+            'retry_after' => (int) env('REDIS_QUEUE_RETRY_AFTER', 960),
             'block_for' => null,
             'after_commit' => false,
         ],
