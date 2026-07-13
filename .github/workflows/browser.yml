@@ -15,6 +15,10 @@ jobs:
     name: Browser Smoke Tests
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write        # push screenshots to an orphan review branch
+      pull-requests: write   # upsert the screenshot review comment
+
     env:
       APP_ENV: testing
       DB_CONNECTION: pgsql
@@ -114,3 +118,74 @@ jobs:
           path: tests/Browser/Screenshots/
           if-no-files-found: warn
           retention-days: 7
+
+      # Publish the screenshots so they can be reviewed inline on the PR instead of
+      # downloading the zip. GitHub markdown can only embed hosted images, so push this run's
+      # PNGs to a tiny orphan branch (single force-pushed commit — no history growth; core is
+      # public so raw.githubusercontent URLs render) and build a sticky comment from them.
+      - name: Stage screenshots for the PR comment
+        id: screenshots
+        if: always() && github.event.pull_request.number != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          SRC=tests/Browser/Screenshots
+          mapfile -t shots < <(find "$SRC" -type f -name '*.png' 2>/dev/null | sort)
+          if [ ${#shots[@]} -eq 0 ]; then
+            echo "has_screenshots=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          branch="screenshots-pr-${PR}"
+          work="$(mktemp -d)"
+          for f in "${shots[@]}"; do cp "$f" "$work/$(basename "$f")"; done
+
+          git -C "$work" init -q
+          git -C "$work" checkout -q --orphan shots
+          git -C "$work" add .
+          git -C "$work" -c user.name='seatplus-ci' -c user.email='ci@seatplus.local' \
+            commit -q -m "browser screenshots for PR #${PR} (${GITHUB_SHA})"
+          git -C "$work" push -q --force \
+            "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" "shots:${branch}"
+
+          comment="$RUNNER_TEMP/screenshots-comment.md"
+          {
+            echo "<!-- browser-screenshots -->"
+            echo "## 📸 Browser test screenshots"
+            echo
+            echo "Run [#${GITHUB_RUN_ID}](https://github.com/${REPO}/actions/runs/${GITHUB_RUN_ID}) · commit \`$(echo "${GITHUB_SHA}" | cut -c1-7)\` · status **${{ job.status }}**"
+            echo
+            for f in "${shots[@]}"; do
+              base="$(basename "$f")"
+              name="$(basename "$f" .png)"
+              echo "<details><summary>${name}</summary>"
+              echo
+              echo "![${name}](https://raw.githubusercontent.com/${REPO}/${branch}/${base})"
+              echo
+              echo "</details>"
+            done
+          } > "$comment"
+
+          echo "has_screenshots=true" >> "$GITHUB_OUTPUT"
+          echo "comment_path=$comment" >> "$GITHUB_OUTPUT"
+
+      - name: Find existing screenshot comment
+        id: find_comment
+        if: always() && steps.screenshots.outputs.has_screenshots == 'true'
+        uses: peter-evans/find-comment@v3
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '<!-- browser-screenshots -->'
+
+      - name: Upsert screenshot comment
+        if: always() && steps.screenshots.outputs.has_screenshots == 'true'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body-path: ${{ steps.screenshots.outputs.comment_path }}
+          edit-mode: replace
