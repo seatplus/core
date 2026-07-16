@@ -42,7 +42,7 @@ function actingAsCharacter(): \Seatplus\Eveapi\Models\Character\CharacterInfo
     // screenshots instead of the generic default it returns for fabricated ids. Pick one from the
     // pool (real GSF members) not already taken in this RefreshDatabase-isolated test — so repeated
     // logins/characters vary — and fall back to the factory's random id if the pool is exhausted.
-    $realCharacterIds = [240070320, 197343093, 1319140135, 92081232, 94391213, 887625289, 1435633555, 1809892636];
+    $realCharacterIds = \Illuminate\Support\Arr::shuffle([240070320, 197343093, 1319140135, 92081232, 94391213, 887625289, 1435633555, 1809892636]);
     $availableCharacterIds = array_values(array_diff(
         $realCharacterIds,
         \Seatplus\Eveapi\Models\Character\CharacterInfo::query()->pluck('character_id')->all()
