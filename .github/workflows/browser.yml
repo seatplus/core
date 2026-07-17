@@ -151,6 +151,21 @@ jobs:
           git -C "$work" push -q --force \
             "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" "shots:${branch}"
 
+          # Pair screenshots by view name: files are named "<view>-desktop.png" / "<view>-iphone.png"
+          # (see snap() in the browser tests), so group them into one row per view with a Desktop and
+          # an iPhone column. Anything without a device suffix is listed underneath.
+          declare -A desktop_url iphone_url other_url
+          for f in "${shots[@]}"; do
+            base="$(basename "$f")"
+            name="$(basename "$f" .png)"
+            url="https://raw.githubusercontent.com/${REPO}/${branch}/${base}"
+            case "$name" in
+              *-desktop) desktop_url["${name%-desktop}"]="$url" ;;
+              *-iphone)  iphone_url["${name%-iphone}"]="$url" ;;
+              *)         other_url["$name"]="$url" ;;
+            esac
+          done
+
           comment="$RUNNER_TEMP/screenshots-comment.md"
           {
             echo "<!-- browser-screenshots -->"
@@ -158,15 +173,29 @@ jobs:
             echo
             echo "Run [#${GITHUB_RUN_ID}](https://github.com/${REPO}/actions/runs/${GITHUB_RUN_ID}) · commit \`$(echo "${GITHUB_SHA}" | cut -c1-7)\` · status **${{ job.status }}**"
             echo
-            for f in "${shots[@]}"; do
-              base="$(basename "$f")"
-              name="$(basename "$f" .png)"
-              echo "<details><summary>${name}</summary>"
+            echo "| View | Desktop | iPhone |"
+            echo "| --- | --- | --- |"
+            while IFS= read -r key; do
+              [ -z "$key" ] && continue
+              d="${desktop_url[$key]:-}"
+              i="${iphone_url[$key]:-}"
+              dcell="—"; icell="—"
+              [ -n "$d" ] && dcell="<img src=\"$d\" width=\"420\">"
+              [ -n "$i" ] && icell="<img src=\"$i\" width=\"220\">"
+              echo "| \`${key}\` | ${dcell} | ${icell} |"
+            done < <(printf '%s\n' "${!desktop_url[@]}" "${!iphone_url[@]}" | sort -u)
+
+            if [ ${#other_url[@]} -gt 0 ]; then
               echo
-              echo "![${name}](https://raw.githubusercontent.com/${REPO}/${branch}/${base})"
+              echo "<details><summary>Other screenshots</summary>"
+              echo
+              while IFS= read -r name; do
+                [ -z "$name" ] && continue
+                echo "<img src=\"${other_url[$name]}\" width=\"420\"> "
+              done < <(printf '%s\n' "${!other_url[@]}" | sort)
               echo
               echo "</details>"
-            done
+            fi
           } > "$comment"
 
           echo "has_screenshots=true" >> "$GITHUB_OUTPUT"
