@@ -217,6 +217,7 @@ Follow the [Spatie PHP/Laravel guidelines](https://spatie.be/guidelines/laravel)
 - **Control flow:** curly braces always; happy-path last with early-return guards; avoid `else`; prefer separate `if`s over compound `&&`/`||`.
 - **Docblocks** only when they add context beyond the signature; array-shape types `@param array{name: string} $x`.
 - **Comments** explain *why*, not *what*.
+- **File headers:** do **not** add the MIT license header block to new files — start directly with `<?php` (+ `declare(strict_types=1);` / `namespace`). Legacy files still carry the header; leave those as-is unless editing for another reason.
 
 > Note: the codebase currently uses **snake_case local variables** widely, which
 > conflicts with the Spatie camelCase rule. A project-wide camelCase
