@@ -182,6 +182,12 @@ non-negotiable — the dev shell/container exports `DB_DATABASE=seatplus`, and w
 `migrate:fresh` against the **dev** database and wipes it. Tests must never touch
 `seatplus`. Browser tests run in core against the `laravel` DB too.
 
+**Browser screenshot tests** (web `tests/Browser/`): the `snap($page, $name)` helper
+captures a screenshot rendered in CI as a **Desktop | iPhone** table. Capture **both**
+viewports — parametrize the test `->with(['desktop', 'iphone'])`, build the page with
+`deviceVisit($device, $url)` (not bare `visit()`), and name the snap `"…-{$device}"`. A
+desktop-only `snap()` leaves an empty iPhone cell in the matrix.
+
 Root-level tests (array cache + sync queue, no PostgreSQL): `./vendor/bin/phpunit`.
 **100% type coverage is enforced** (`pest --type-coverage --min=100`); all packages
 also enforce PHPStan/Larastan and Pint (PSR-12). Run the specific changed test
