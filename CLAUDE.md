@@ -188,6 +188,12 @@ viewports — parametrize the test `->with(['desktop', 'iphone'])`, build the pa
 `deviceVisit($device, $url)` (not bare `visit()`), and name the snap `"…-{$device}"`. A
 desktop-only `snap()` leaves an empty iPhone cell in the matrix.
 
+**Running browser tests:** they run on the **host Mac** (Pest 4 + Playwright) or in CI's
+"Browser (vs core)" job — the dev container has no browser, so they cannot run in-container.
+To run them on the host, the branch must be checked out in the **real `packages/web`
+working copy**; an agent's `git worktree` under `.claude/worktrees/` isn't where the host
+runner looks, so check the branch out in the main checkout first.
+
 Root-level tests (array cache + sync queue, no PostgreSQL): `./vendor/bin/phpunit`.
 **100% type coverage is enforced** (`pest --type-coverage --min=100`); all packages
 also enforce PHPStan/Larastan and Pint (PSR-12). Run the specific changed test
