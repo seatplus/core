@@ -17,11 +17,14 @@
 # locally; regenerate with `composer run local:on` if package paths drift.
 composer.local.json
 
-# ── NOT solved by this file — read before running suites in parallel ──────────
-# phpunit.xml pins DB_DATABASE=laravel with force="true" in EVERY package, so
-# test runs ignore the per-worktree .env above and ALL hit the single `laravel`
-# Postgres DB. Two worktrees running `composer run test` at once will corrupt
-# each other's migrations. Until phpunit's forced DB name is made per-worktree,
-# run test suites SERIALLY across worktrees (app/dev usage in parallel is fine).
-# Browser tests are unaffected here — they only run in the "Browser (vs core)"
+# ── Test-DB isolation (read before running suites in parallel) ────────────────
+# Each Postgres-using package pins its OWN test DB via phpunit.xml force="true":
+# auth -> laravel_auth, eveapi -> laravel_eveapi, web -> laravel_web
+# (esi-client / esi-schema use no DB). So DIFFERENT packages' suites run in
+# parallel safely. The force pin also means test runs ignore the per-worktree
+# DB_DATABASE set in .env above — that value is for running the actual app, not
+# the tests. createdb the per-package test DBs once on the host Postgres.
+# Remaining limit: two worktrees of the SAME package share that package's test
+# DB — don't run `composer run test` for the same package in two worktrees at
+# once. Browser tests are unaffected — they only run in the "Browser (vs core)"
 # CI job, not locally.
