@@ -241,6 +241,54 @@ Services tool window (View → Tool Windows → Services) → right-click the
 container → *Rebuild Container*. Or run `devcontainer rebuild` from the
 terminal.
 
+## Working in Orca (multi-agent, optional)
+
+[Orca](https://www.onorca.dev) runs several coding agents in parallel, each in its
+own git worktree. Because this repo is a monorepo whose real packages are
+*separate git repos* checked out under `/packages` (gitignored here), pick the
+unit of work by layer — this mirrors how CI is split:
+
+- **Backend packages** (`esi-client`, `esi-schema`, `eveapi`, `auth`) — open **each
+  package repo as its own Orca project**. They're self-contained, have their own
+  tests (`composer run test`) and own PRs, so worktrees are naturally isolated and
+  parallel-safe. Note: a standalone package checkout does **not** inherit this root
+  `CLAUDE.md`, the `.claude/skills/`, or the laravel-boost MCP — each package
+  carries its own lean `CLAUDE.md`; see "Skills" below for the shared skills.
+- **Web / running the app / browser-MCP work** — work in the **assembled core**
+  (`/workspace`). `web` has no `artisan` and can't run standalone (`@/actions`,
+  `vite build`, and browser tests only exist in core). The browser MCP
+  (`claude-in-chrome`) is global, so it's available anywhere, but only *useful*
+  against the running core app.
+
+**Web live-preview — two models:**
+1. **Edit in place (default, simplest).** Run `npm run dev` in core and let the
+   agent edit `packages/web` directly. `vendor/seatplus/web` symlinks to it, and
+   `vite.config.js` auto-runs `vendor:publish --tag=web` on any
+   `vendor/seatplus/**/resources/js/**` change → HMR. The dev server "just sees"
+   package edits. Trade-off: no worktree isolation for web (one web task at a time,
+   mixed with your working copy).
+2. **Repoint per worktree (isolated).** Give the agent its own `web` worktree, then
+   run `./orca-web-worktree.sh <path-to-web-worktree>` to point core's path repo at
+   it (`… reset` restores `packages/web`). Isolated, but one web worktree is
+   live-served per running core app — parallel web previews need one core app per
+   port.
+
+**Per-worktree state.** `orca.yaml` symlink-shares the heavy gitignored dirs
+(`node_modules`, `vendor`, `packages`, `public/build`) into each worktree;
+`.worktreeinclude` copies `.env` + `composer.local.json` so each worktree owns
+them. In each worktree's `.env` set a unique `DB_DATABASE` / `REDIS_PREFIX` to
+avoid collisions on the shared Postgres/Redis. Test DBs are already isolated
+*per package* (`laravel_auth`, `laravel_eveapi`, `laravel_web`), so cross-package
+suites run in parallel safely; two worktrees of the *same* package still share
+that package's test DB.
+
+**Skills.** The shared skills (`laravel-best-practices`, `pest-testing`,
+`spatie-*`) live only in core's `.claude/skills/`. To make them available in
+standalone package projects too, install the subset at the **user level** on the
+host running Orca (`~/.claude/skills/`) — that reaches every project regardless of
+where Orca puts the worktree. (Committing per-repo symlinks is fragile: they break
+in Orca-managed worktrees outside `/workspace`.)
+
 ## Hard limits (no exceptions without explicit approval)
 
 - Never merge PRs or create git tags/releases.

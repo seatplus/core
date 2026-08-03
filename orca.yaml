@@ -1,0 +1,32 @@
+# Orca worktree recipe for Seatplus Core (https://www.onorca.dev)
+#
+# A fresh `git worktree` of this repo comes up BARE: /packages, /vendor,
+# /node_modules, /public/build, .env and composer.local.json are all gitignored,
+# so nothing below is checked out by git. This file (symlinked, shared deps) plus
+# .worktreeinclude (copied, per-worktree-owned config) backfill them so an agent
+# lands in a bootable checkout instead of an empty one.
+
+worktree:
+  # Large, gitignored, read-mostly directories. Orca symlinks these from the
+  # primary checkout into each new worktree instead of copying — fast, no disk
+  # blow-up. Safe because agents don't edit dependency dirs.
+  sharedDirectories:
+    - node_modules            # root JS deps
+    - vendor                  # root composer deps (merge-plugin already resolved)
+    - public/build            # compiled Vite assets
+
+    # Local-dev-only package checkouts (the whole /packages tree is gitignored;
+    # merge-plugin + composer.local.json resolve seatplus/* from here). Each
+    # package carries its own vendor/, so symlinking the tree shares those too.
+    #
+    # ⚠️ TRADEOFF: symlinking shares package SOURCE across every worktree, so two
+    # agents editing the same package (e.g. packages/auth) WILL clobber each
+    # other — there's no isolation. This default is right for root/web-level work
+    # and for read-only package reference. If you want parallel agents editing
+    # DIFFERENT packages in isolation, delete this line and keep using the
+    # per-package worktree trick (worktree the package repo itself, hardlink its
+    # vendor) instead of a root-level Orca worktree.
+    #
+    # NB: teammates whose install pulls seatplus/* from Packagist have no
+    # /packages dir; a missing symlink target is only relevant to local checkouts.
+    - packages
