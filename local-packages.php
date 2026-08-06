@@ -18,8 +18,8 @@ declare(strict_types=1);
  * Two layouts are supported, in priority order:
  *
  *   1. NESTED   core/packages/<name>  — checkouts inside core. Needed anywhere
- *      only core is reachable (e.g. the dev container, which bind-mounts core
- *      alone).
+ *      only core is reachable and the sibling clones are not (a bind-mounted or
+ *      otherwise partial checkout).
  *   2. SIBLING  <workspace>/<name>    — clones next to core. This is the default
  *      and the layout Orca's layered model produces: each backend package is its
  *      own Orca project, i.e. its own top-level clone. See "Working in Orca" in

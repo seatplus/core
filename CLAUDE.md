@@ -228,19 +228,6 @@ Follow the [Spatie PHP/Laravel guidelines](https://spatie.be/guidelines/laravel)
 - `EVE_CLIENT_ID`, `EVE_CLIENT_SECRET`, `EVE_CALLBACK_URL` — EVE OAuth credentials.
 - Trusted proxies set to `*` (reverse-proxy support); logging via the `daily` driver.
 
-## Dev-container isolation
-
-This project runs Claude Code inside a dev-container (`.devcontainer/`). Only
-`/workspace` is mounted — host home dir, SSH keys, and 1Password socket are
-**not** accessible. Postgres and Redis are reached over `host.docker.internal`
-(Herd on the host Mac). There is no path to host resources outside the
-workspace mount, so don't attempt it.
-
-IDE: **PhpStorm**. To rebuild the container after Dockerfile changes: open the
-Services tool window (View → Tool Windows → Services) → right-click the
-container → *Rebuild Container*. Or run `devcontainer rebuild` from the
-terminal.
-
 ## Working in Orca (multi-agent, optional)
 
 [Orca](https://www.onorca.dev) runs several coding agents in parallel, each in its
@@ -256,7 +243,7 @@ mirrors how CI is split:
   `CLAUDE.md`, the `.claude/skills/`, or the laravel-boost MCP — each package
   carries its own lean `CLAUDE.md`; see "Skills" below for the shared skills.
 - **Web / running the app / browser-MCP work** — work in the **assembled core**
-  (`/workspace`). `web` has no `artisan` and can't run standalone (`@/actions`,
+  checkout. `web` has no `artisan` and can't run standalone (`@/actions`,
   `vite build`, and browser tests only exist in core). The browser MCP
   (`claude-in-chrome`) is global, so it's available anywhere, but only *useful*
   against the running core app.
@@ -288,7 +275,7 @@ that package's test DB.
 standalone package projects too, install the subset at the **user level** on the
 host running Orca (`~/.claude/skills/`) — that reaches every project regardless of
 where Orca puts the worktree. (Committing per-repo symlinks is fragile: they break
-in Orca-managed worktrees outside `/workspace`.)
+in Orca-managed worktrees, which live outside the workspace.)
 
 ## Hard limits (no exceptions without explicit approval)
 
