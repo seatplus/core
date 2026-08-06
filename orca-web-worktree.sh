@@ -7,10 +7,10 @@
 # Core resolves the frontend through the `vendor/seatplus/web` symlink; Vite
 # watches + republishes from there. Repointing that symlink (and the
 # composer.local.json path repo, so a later `composer install` keeps it) is all
-# that's needed — no `composer update`, so it works offline in the dev container.
+# that's needed — no `composer update`, so it works offline.
 #
 #   ./orca-web-worktree.sh <path-to-web-worktree>   # serve that worktree
-#   ./orca-web-worktree.sh reset                     # restore packages/web
+#   ./orca-web-worktree.sh reset                     # restore the workspace checkout of seatplus/web
 #   ./orca-web-worktree.sh status                    # show current target
 #
 set -euo pipefail
@@ -18,7 +18,10 @@ set -euo pipefail
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 link="$root/vendor/seatplus/web"
 local_json="$root/composer.local.json"
-default_target="$root/packages/web"
+# Ask the generator where seatplus/web actually lives — it knows both the sibling
+# workspace layout (default) and the nested packages/* fallback, so `reset` stays
+# correct without hardcoding either.
+default_target="$(php "$root/local-packages.php" path seatplus/web 2>/dev/null || true)"
 
 usage() { grep '^#' "$0" | grep -v '^#!' | sed 's/^# \{0,1\}//'; exit "${1:-0}"; }
 
@@ -78,10 +81,15 @@ case "$cmd" in
     ""|-h|--help) usage 0 ;;
     status) show_status ;;
     reset)
-        # Relative link matches how the composer path repo originally created it.
-        ( cd "$root/vendor/seatplus" && ln -sfn ../../packages/web web )
-        echo "✔ reset: vendor/seatplus/web -> ../../packages/web"
-        update_local_json "packages/web"
+        [[ -n "$default_target" ]] || {
+            echo "error: no local seatplus/web checkout found — run 'composer run local:on' first" >&2
+            exit 1
+        }
+        # Absolute link, matching the absolute urls local-packages.php emits. A
+        # later `composer install` re-normalises it to composer's own form.
+        ln -sfn "$default_target" "$link"
+        echo "✔ reset: vendor/seatplus/web -> $default_target"
+        update_local_json "$default_target"
         ;;
     *)
         [[ -e "$cmd" ]] || { echo "error: worktree path '$cmd' does not exist" >&2; exit 1; }

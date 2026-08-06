@@ -266,7 +266,7 @@ mirrors how CI is split:
    mixed with your working copy).
 2. **Repoint per worktree (isolated).** Give the agent its own `web` worktree, then
    run `./orca-web-worktree.sh <path-to-web-worktree>` to point core's path repo at
-   it (`… reset` restores `packages/web`). Isolated, but one web worktree is
+   it (`… reset` restores the workspace checkout). Isolated, but one web worktree is
    live-served per running core app — parallel web previews need one core app per
    port.
 
