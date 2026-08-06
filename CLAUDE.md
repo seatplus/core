@@ -262,10 +262,15 @@ mirrors how CI is split:
    port.
 
 **Per-worktree state.** `orca.yaml` symlink-shares the heavy gitignored dirs
-(`node_modules`, `vendor`, `packages`, `public/build`) into each worktree;
-`.worktreeinclude` copies `.env` + `composer.local.json` so each worktree owns
-them. In each worktree's `.env` set a unique `DB_DATABASE` / `REDIS_PREFIX` to
-avoid collisions on the shared Postgres/Redis. Test DBs are already isolated
+(`node_modules`, `vendor`, `public/build`) into each worktree; `.worktreeinclude`
+copies `.env` + `composer.local.json` so each worktree owns them. Package sources
+need no sharing: `composer.local.json`'s path-repo urls are **absolute** and
+anchored on the primary checkout, so the copied file is correct inside a worktree at
+any path (Orca puts them under `~/orca/workspaces/<project>/<slug>`, outside the
+workspace). ⚠️ `vendor` is shared and *mutable* — a `composer update`/`install` in
+any worktree rewrites the primary's `vendor/`, so resolve dependencies in the
+primary checkout. In each worktree's `.env` set a unique `DB_DATABASE` /
+`REDIS_PREFIX` to avoid collisions on the shared Postgres/Redis. Test DBs are already isolated
 *per package* (`laravel_auth`, `laravel_eveapi`, `laravel_web`), so cross-package
 suites run in parallel safely; two worktrees of the *same* package still share
 that package's test DB.
