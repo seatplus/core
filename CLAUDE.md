@@ -175,14 +175,18 @@ composer run test       # lint + types + type-coverage + unit
 vendor/bin/pest --filter "test name"
 ```
 
-**DB isolation (critical):** every package's `phpunit.xml` pins
-`<env name="DB_DATABASE" value="laravel" force="true"/>`. The `force="true"` is
-non-negotiable — the dev shell/container exports `DB_DATABASE=seatplus`, and without
-`force` that env var overrides the test config, so `LazilyRefreshDatabase` runs
-`migrate:fresh` against the **dev** database and wipes it. Tests must never touch
-`seatplus`. Browser tests run in core against the `laravel` DB too.
+**DB isolation (critical):** every package's `phpunit.xml` pins its own test DB
+with `force="true"` — `laravel_auth`, `laravel_eveapi`, `laravel_web`. The
+`force="true"` is non-negotiable — the dev shell exports `DB_DATABASE=seatplus`,
+and without `force` that env var overrides the test config, so
+`LazilyRefreshDatabase` runs `migrate:fresh` against the **dev** database and wipes
+it. Tests must never touch `seatplus`. Core's own `phpunit.xml` pins `laravel`,
+matching `POSTGRES_DB` in `browser.yml` and `regression.yml`.
 
-Root-level tests (array cache + sync queue, no PostgreSQL): `./vendor/bin/phpunit`.
+Core's only suite is `Browser` (`./tests/Browser`), synced in from the web package
+by `composer run browser:sync`; there is no root-level Unit/Feature suite. Run it
+with `composer run browser` — bare `./vendor/bin/phpunit` aborts, since these are
+Pest tests and Pest owns the runner.
 **100% type coverage is enforced** (`pest --type-coverage --min=100`); all packages
 also enforce PHPStan/Larastan and Pint (PSR-12). Run the specific changed test
 first, then offer the full suite.

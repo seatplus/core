@@ -122,12 +122,13 @@ binaries. Screenshots from a run land in `tests/Browser/Screenshots/`.
 
 > ⚠️ **Dedicated test database.** These tests use `RefreshDatabase` (`migrate:fresh`),
 > so they must never run against the dev database — that would wipe it. `phpunit.xml`
-> pins the test DB to **`seatplus_testing`** (`force="true"`, so it holds regardless
-> of the `DB_DATABASE` env var). Create it once before running:
+> pins the test DB to **`laravel`** (`force="true"`, so it holds regardless of the
+> `DB_DATABASE` env var). Create it once before running:
 >
 > ```bash
-> createdb seatplus_testing        # same host/user/password as the dev DB
+> createdb laravel                 # same host/user/password as the dev DB
 > ```
 >
-> CI must provide a `seatplus_testing` database for the browser job. SQLite `:memory:`
-> is not usable (pgsql-specific migrations + the in-process browser server).
+> CI provides it as `POSTGRES_DB: laravel` in both `browser.yml` and
+> `regression.yml`. SQLite `:memory:` is not usable (pgsql-specific migrations +
+> the in-process browser server).
