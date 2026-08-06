@@ -21,7 +21,7 @@ esi-client → eveapi → auth → web (optional)
 - **auth** — EVE OAuth, the role/affiliation/permission system, and SSO scope
   compliance. All security and permission logic lives here; full test coverage,
   100% type coverage, PHPStan. When auth behaviour is unclear,
-  `packages/auth/tests/` is authoritative. (It is one package in the chain, not
+  `../auth/tests/` is authoritative. (It is one package in the chain, not
   the project's "core" — the whole project is "Seatplus Core".)
 - **web** — *optional* Vue 3 + Inertia v3 frontend and recruiter UI. The
   esi-client + eveapi + auth stack is a complete headless service without it.
@@ -31,7 +31,7 @@ in auth/eveapi/esi-client must not be placed in `web` for convenience.
 
 ## Auth package — the core domain
 
-`packages/auth` is the most important package and the authoritative source for
+`../auth` is the most important package and the authoritative source for
 every security, permission, and compliance concern.
 
 **Users & characters:** a `User` owns multiple EVE characters via `CharacterUser`;
@@ -70,11 +70,11 @@ implement `RoleServiceInterface` — always use the concrete service.
 
 **RoleMembership status:** `active` / `inactive` (SSO non-compliant) / `pending` (awaiting on-request approval).
 
-`packages/auth/tests/Architecture/ArchitectureTest.php` asserts no `dd()`/`dump()` — keep it passing.
+`../auth/tests/Architecture/ArchitectureTest.php` asserts no `dd()`/`dump()` — keep it passing.
 
 ## ESI data layer (eveapi)
 
-**Flow:** a queued `EsiJob` receives an `EsiClient` (container-injected into `handle()`), calls `self::OPERATION_CLASS::execute($esi, ...)` on its esi-schema operation class → esi-client fires the Guzzle request (RFC 7234 cache) and returns the typed result → `executeJob()` upserts models inside the DB transaction that `EsiJob::handle()` wraps. (Full rationale in `packages/eveapi/ARCHITECTURE.md`.)
+**Flow:** a queued `EsiJob` receives an `EsiClient` (container-injected into `handle()`), calls `self::OPERATION_CLASS::execute($esi, ...)` on its esi-schema operation class → esi-client fires the Guzzle request (RFC 7234 cache) and returns the typed result → `executeJob()` upserts models inside the DB transaction that `EsiJob::handle()` wraps. (Full rationale in `../eveapi/ARCHITECTURE.md`.)
 
 ESI jobs extend `EsiJob` (`ShouldQueue + ShouldBeUnique`) and declare a single `protected const string OPERATION_CLASS = SomeEsiSchemaClass::class` — the generated esi-schema class holds endpoint metadata (`REQUIRED_SCOPE`, `RATE_LIMIT_GROUP`, `RATE_LIMIT_MAX_TOKENS`/`RATE_LIMIT_WINDOW`, `CACHE_AGE`, `REQUIRED_ROLES`) so the job declares no `method`/`endpoint`/`version` and no capability traits. Each job overrides `tags()` (unique id + Horizon tag) and `executeJob(EsiClient $esi): void`.
 
@@ -110,13 +110,13 @@ final class CharacterInfoJob extends EsiJob
 ```
 
 > The `web` package injects `EsiClient` directly into its services (DI over the
-> `RetrieveEsiData` facade) — see `packages/web/src/Services`. A test guard
-> (`packages/web/tests/Architecture/EsiClientInjectionTest.php`) fails if any web
+> `RetrieveEsiData` facade) — see `../web/src/Services`. A test guard
+> (`../web/tests/Architecture/EsiClientInjectionTest.php`) fails if any web
 > production code resolves `EsiClient` from the container.
 
 ## Web package (optional frontend)
 
-- Vue SFC pages in `packages/web/resources/js/Pages/`; Inertia bridges controllers to Vue (no separate API). Activate `inertia-vue-development` for Vue work.
+- Vue SFC pages in `../web/resources/js/Pages/`; Inertia bridges controllers to Vue (no separate API). Activate `inertia-vue-development` for Vue work.
 - Wayfinder: import typed routes from `@/actions/` (controllers) or `@/routes/` (named routes). These files are **gitignored + generated** — run `php artisan wayfinder:generate` after route changes. CI generates them in the "Browser (vs core)" job (which assembles the full app) before the build; the package's own CI job is **"Frontend Lint" only** (no `vite build`) — a package has no app to generate `@/actions` against, so the real production build is validated against core.
 - Publish assets to the root app: `php artisan vendor:publish --tag=web --force`.
 - Query macros `whereAffiliatedCorporations` / `whereAffiliatedCharacters` (registered in `WebServiceProvider`) apply affiliation joins; superusers bypass them.
@@ -170,7 +170,7 @@ Package tests run from inside each package dir and need PostgreSQL
 (`seatplus`/`secret` @ 127.0.0.1:5432) and Redis (127.0.0.1:6379):
 
 ```bash
-cd packages/auth        # or eveapi, esi-client, web
+cd ../auth              # or eveapi, esi-client, web (siblings of core)
 composer run test       # lint + types + type-coverage + unit
 vendor/bin/pest --filter "test name"
 ```
@@ -245,8 +245,9 @@ terminal.
 
 [Orca](https://www.onorca.dev) runs several coding agents in parallel, each in its
 own git worktree. Because this repo is a monorepo whose real packages are
-*separate git repos* checked out under `/packages` (gitignored here), pick the
-unit of work by layer — this mirrors how CI is split:
+*separate git repos* cloned as **siblings of core in the workspace** — which is
+precisely why each is its own Orca project — pick the unit of work by layer; this
+mirrors how CI is split:
 
 - **Backend packages** (`esi-client`, `esi-schema`, `eveapi`, `auth`) — open **each
   package repo as its own Orca project**. They're self-contained, have their own
@@ -262,7 +263,7 @@ unit of work by layer — this mirrors how CI is split:
 
 **Web live-preview — two models:**
 1. **Edit in place (default, simplest).** Run `npm run dev` in core and let the
-   agent edit `packages/web` directly. `vendor/seatplus/web` symlinks to it, and
+   agent edit the workspace's `web` clone directly. `vendor/seatplus/web` symlinks to it, and
    `vite.config.js` auto-runs `vendor:publish --tag=web` on any
    `vendor/seatplus/**/resources/js/**` change → HMR. The dev server "just sees"
    package edits. Trade-off: no worktree isolation for web (one web task at a time,
