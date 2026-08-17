@@ -125,11 +125,35 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
+      # A PR opened with the default GITHUB_TOKEN never fires `pull_request` events —
+      # GitHub's recursion guard — so browser.yml would skip the bump PR entirely and it
+      # would land with zero checks. Mint a short-lived installation token instead so the
+      # PR is authored by the app and CI treats it like any human PR.
+      # Reuses the same release app as esi-schema (vars.RELEASE_APP_ID +
+      # secrets.RELEASE_APP_PRIVATE_KEY); it needs contents + pull-requests write on core.
+      # continue-on-error: if the app is ever missing here this degrades to the old
+      # GITHUB_TOKEN behaviour (PR opens, no checks) rather than failing the regression run.
+      - name: Mint an App token
+        id: app-token
+        if: steps.changed.outputs.changed == 'true'
+        continue-on-error: true
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+      - name: Warn when the App token is unavailable
+        if: steps.changed.outputs.changed == 'true' && steps.app-token.outputs.token == ''
+        run: |
+          echo "::warning::RELEASE_APP_ID / RELEASE_APP_PRIVATE_KEY unavailable — \
+          falling back to GITHUB_TOKEN, so the bump PR will not trigger any workflows."
+
       # Reached only if the suite passed (a failing suite fails the job = regression alert).
       - name: Open bump PR
         if: steps.changed.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
+          token: ${{ steps.app-token.outputs.token || github.token }}
           commit-message: "chore: bump seatplus/* to latest release"
           title: "chore: bump seatplus/* to latest release"
           branch: chore/seatplus-bump
