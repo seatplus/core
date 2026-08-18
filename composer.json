@@ -62,7 +62,8 @@
             "@php artisan lang:publish",
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
             "@php artisan vendor:publish --tag=web-static --force",
-            "@php artisan vendor:publish --tag=web --force"
+            "@php artisan vendor:publish --tag=web --force",
+            "@php artisan wayfinder:generate"
         ],
         "local:on": "@php local-packages.php on",
         "local:off": "@php local-packages.php off",
