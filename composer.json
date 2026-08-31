@@ -20,17 +20,17 @@
         "laravel/framework": "^13.0",
         "laravel/tinker": "^3.0",
         "seatplus/web": "^5.0",
-        "symfony/process": "^7.0"
+        "symfony/process": "^8.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
         "laravel/boost": "^2.4",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.1",
-        "pestphp/pest": "^4",
-        "pestphp/pest-plugin-browser": "^4.3",
-        "pestphp/pest-plugin-laravel": "^4",
-        "phpunit/phpunit": "^12.5",
+        "pestphp/pest": "^5.0",
+        "pestphp/pest-plugin-browser": "^5.0",
+        "pestphp/pest-plugin-laravel": "^5.0",
+        "phpunit/phpunit": "^13.2",
         "spatie/guidelines-skills": "^1.0",
         "spatie/laravel-ignition": "^2.0",
         "wikimedia/composer-merge-plugin": "^2.1"
