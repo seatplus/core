@@ -107,17 +107,17 @@ jobs:
         with:
           node-version: '22'
 
-      # TODO(seatplus/web#1678): swap the ad hoc driver install for
-      # `npm run playwright:install` once a web release carrying fa5b153a is pinned —
-      # see the same note in browser.yml. Note this job runs `composer update seatplus/*`,
-      # so it is the first place the newer package.json will land.
+      # `composer update "seatplus/*"` above always resolves the newest web, and core has no
+      # committed package.json — it is published from the web package. web 5.1.0 is the first
+      # release whose package.json declares `playwright` at an exact version and ships the
+      # `playwright:install` script, so `npm install` now supplies the driver at web's pin and
+      # a `--save-dev playwright` here would overwrite that pin with whatever is latest.
       - name: Build assets + Playwright
         if: steps.changed.outputs.changed == 'true'
         run: |
           npm install
-          npm install --save-dev playwright
           npm run build
-          npx playwright install --with-deps chromium
+          npm run playwright:install
 
       - name: Run browser regression suite
         if: steps.changed.outputs.changed == 'true'

@@ -101,11 +101,12 @@ jobs:
         with:
           node-version: '22'
 
-      # TODO(seatplus/web#1678): once a web release carrying fa5b153a is pinned here,
-      # drop the ad hoc install and use `npm install` + `npm run playwright:install` —
-      # web's package.json then declares `playwright` at an exact version, and installing
-      # it here would override that pin. Until then the released package.json (5.0.1)
-      # declares no playwright at all, so CI has to supply the driver itself.
+      # TODO(seatplus/web#1678): unlike regression.yml this job installs from the committed
+      # lock, which still pins web 5.0.1 — a package.json with neither a `playwright`
+      # dependency nor a `playwright:install` script, so CI has to supply the driver itself.
+      # web 5.1.0 adds both. The moment the lock bump (#241) lands, drop the ad hoc install
+      # in favour of `npm run playwright:install` as regression.yml already does: from then
+      # on installing playwright here overrides web's exact pin.
       - name: Install npm dependencies + Playwright driver
         run: |
           npm install
