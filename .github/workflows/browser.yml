@@ -77,10 +77,15 @@ jobs:
 
       # The web package's frontend (package.json, vite/tailwind/postcss configs,
       # resources/js, css) is published into core, not committed.
+      # `wayfinder:generate` is what produces @/actions and @/routes. It has to run
+      # here, on the php-equipped runner: the vite build no longer generates it (the
+      # production node container has no php binary — seatplus/web#1678), so this is
+      # the same step base-app gets from core's post-update-cmd.
       - name: Publish web package assets
         run: |
           php artisan vendor:publish --tag=web-static --force
           php artisan vendor:publish --tag=web --force
+          php artisan wayfinder:generate
 
       # Browser tests are authored in the web package and shipped in its dist;
       # run them here against the assembled app (no-op until web ships tests/Browser).
@@ -96,6 +101,11 @@ jobs:
         with:
           node-version: '22'
 
+      # TODO(seatplus/web#1678): once a web release carrying fa5b153a is pinned here,
+      # drop the ad hoc install and use `npm install` + `npm run playwright:install` —
+      # web's package.json then declares `playwright` at an exact version, and installing
+      # it here would override that pin. Until then the released package.json (5.0.1)
+      # declares no playwright at all, so CI has to supply the driver itself.
       - name: Install npm dependencies + Playwright driver
         run: |
           npm install
