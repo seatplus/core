@@ -1,15 +1,1 @@
-{
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -f /.dockerenv ] || echo '{\"systemMessage\": \"WARNING: Claude Code is running on the HOST machine, not inside the dev-container. Host resources (SSH keys, home directory, 1Password socket) may be accessible!\"}'",
-            "statusMessage": "Checking dev-container isolation..."
-          }
-        ]
-      }
-    ]
-  }
-}
+{}
