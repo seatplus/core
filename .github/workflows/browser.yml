@@ -165,7 +165,10 @@ jobs:
           # Pair screenshots by view name: files are named "<view>-desktop.png" / "<view>-iphone.png"
           # (see snap() in the browser tests), so group them into one row per view with a Desktop and
           # an iPhone column. Anything without a device suffix is listed underneath.
-          declare -A desktop_url iphone_url other_url
+          # Initialise with `=()`: `declare -A x` alone leaves x unset as far as `set -u` is
+          # concerned, so `${#other_url[@]}` below aborts the step whenever no screenshot
+          # lands in that bucket — which is every run where all shots carry a device suffix.
+          declare -A desktop_url=() iphone_url=() other_url=()
           for f in "${shots[@]}"; do
             base="$(basename "$f")"
             name="$(basename "$f" .png)"
