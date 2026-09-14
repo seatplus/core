@@ -182,6 +182,18 @@ non-negotiable — the dev shell/container exports `DB_DATABASE=seatplus`, and w
 `migrate:fresh` against the **dev** database and wipes it. Tests must never touch
 `seatplus`. Browser tests run in core against the `laravel` DB too.
 
+**Browser screenshot tests** (web `tests/Browser/`): the `snap($page, $name)` helper
+captures a screenshot rendered in CI as a **Desktop | iPhone** table. Capture **both**
+viewports — parametrize the test `->with(['desktop', 'iphone'])`, build the page with
+`deviceVisit($device, $url)` (not bare `visit()`), and name the snap `"…-{$device}"`. A
+desktop-only `snap()` leaves an empty iPhone cell in the matrix.
+
+**Running browser tests:** they run on the **host Mac** (Pest 4 + Playwright) or in CI's
+"Browser (vs core)" job — the dev container has no browser, so they cannot run in-container.
+To run them on the host, the branch must be checked out in the **real `packages/web`
+working copy**; an agent's `git worktree` under `.claude/worktrees/` isn't where the host
+runner looks, so check the branch out in the main checkout first.
+
 Root-level tests (array cache + sync queue, no PostgreSQL): `./vendor/bin/phpunit`.
 **100% type coverage is enforced** (`pest --type-coverage --min=100`); all packages
 also enforce PHPStan/Larastan and Pint (PSR-12). Run the specific changed test
@@ -217,11 +229,20 @@ Follow the [Spatie PHP/Laravel guidelines](https://spatie.be/guidelines/laravel)
 - **Control flow:** curly braces always; happy-path last with early-return guards; avoid `else`; prefer separate `if`s over compound `&&`/`||`.
 - **Docblocks** only when they add context beyond the signature; array-shape types `@param array{name: string} $x`.
 - **Comments** explain *why*, not *what*.
+- **File headers:** do **not** add the MIT license header block to new files — start directly with `<?php` (+ `declare(strict_types=1);` / `namespace`). Legacy files still carry the header; leave those as-is unless editing for another reason.
 
-> Note: the codebase currently uses **snake_case local variables** widely, which
-> conflicts with the Spatie camelCase rule. A project-wide camelCase
-> standardization is tracked as a separate effort — follow the existing
-> snake_case for consistency until it lands.
+> **snake_case props & payload keys are intentional, not tech-debt.** Vue props,
+> Inertia page props, and `router` data keys mirror the PHP controller payloads
+> (`character_ids`, `ref_types`, `available_scopes`, …), so they stay snake_case
+> to preserve the controller↔component contract; renaming them would require
+> backend changes. `vue/prop-name-casing` stays enabled — add a targeted
+> `// eslint-disable-next-line vue/prop-name-casing -- <reason>` on those props
+> (see `Pages/Character/Wallet/Index.vue`) rather than disabling the rule globally.
+>
+> Separately, the codebase uses **snake_case *local* variables** (`filtered_items`,
+> `image_class`, …) widely, which conflicts with the Spatie camelCase rule. That
+> is legacy tech-debt: a project-wide camelCase standardization is tracked as a
+> separate effort — follow the existing snake_case for consistency until it lands.
 
 ## Key configuration
 
