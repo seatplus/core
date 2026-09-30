@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd" bootstrap="vendor/autoload.php" colors="true">
   <testsuites>
-    <testsuite name="Unit">
-      <directory suffix="Test.php">./tests/Unit</directory>
-    </testsuite>
-    <testsuite name="Feature">
-      <directory suffix="Test.php">./tests/Feature</directory>
+    <!--
+      Core's only suite. The tests are owned by seatplus/web and copied in by
+      `composer run browser:sync` (browser-tests.php); tests/Browser/web is
+      gitignored, so an unsynced checkout finds no tests here — that is expected,
+      not a misconfiguration.
+    -->
+    <testsuite name="Browser">
+      <directory suffix="Test.php">./tests/Browser</directory>
     </testsuite>
   </testsuites>
   <php>
