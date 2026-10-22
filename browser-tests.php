@@ -10,7 +10,8 @@ declare(strict_types=1);
  *   composer run browser:debug    (sync + run headed / debug output)
  *
  * Source is vendor/seatplus/web/tests/Browser — a Packagist install in CI, or the
- * symlinked local checkout (packages/web) when `composer run local:on` is active.
+ * symlinked local checkout (the workspace's `web` clone, or packages/web) when
+ * `composer run local:on` is active.
  * Destination tests/Browser/web is mirrored (wiped + recopied) each run so it never
  * drifts from the package. tests/Browser/Screenshots is left untouched.
  */

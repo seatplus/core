@@ -67,6 +67,7 @@
         ],
         "local:on": "@php local-packages.php on",
         "local:off": "@php local-packages.php off",
+        "local:status": "@php local-packages.php status",
         "browser:sync": "@php browser-tests.php",
         "browser": [
             "@browser:sync",
